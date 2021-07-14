@@ -1,0 +1,64 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    background-color: #111;
+    width: 100%;
+    color: #eee;
+}
+
+/*********************
+    Component Grid
+/*********************/
+
+.grid-container {
+    display: grid;
+    /* [1] Add some gap between rows and columns */
+    grid-gap: .5em;
+    /* [2] Make columns adjust according to the available viewport */
+    grid-template-columns: repeat( auto-fill, minmax( 200px, 1fr ) );
+    /* [3] Set the height for implicitly-created row track */
+    grid-auto-rows: 250px;
+}
+
+.grid-container > * {
+    background-color: #222;
+}
+.row--2x { grid-row-end: span 2; }
+.row--3x { grid-row-end: span 3; }
+.row--4x { grid-row-end: span 4; }
+
+.col--2x { grid-column-end: span 2; }
+.col--3x { grid-column-end: span 3; }
+.col--4x { grid-column-end: span 4; }
+
+/* Grid on large screens */
+@media only screen and (min-width: 1024px) {
+    .grid-container {
+        column-count: 6;
+    }
+}
+
+/* Grid on medium-sized screens */
+@media only screen and (max-width: 1023px) and (min-width: 768px) {
+    .grid-container {
+        column-count: 4;
+    }
+}
+
+/* Grid on small screens */
+@media only screen and (max-width: 767px) and (min-width: 540px) {
+    .grid-container {
+        column-count: 3;
+    }
+}
+
+
+/* Grid on small screens */
+@media only screen and (max-width: 539px) and (min-width: 300px) {
+    .grid-container {
+        column-count: 2;
+    }
+}
