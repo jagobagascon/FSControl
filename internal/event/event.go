@@ -2,6 +2,6 @@ package event
 
 type Event struct {
 	// defining struct variables
-	Index int
+	Name  string
 	Value interface{}
 }

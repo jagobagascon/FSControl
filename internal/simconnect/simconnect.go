@@ -12,11 +12,11 @@ import (
 type Controller struct {
 	shutdown chan bool
 
-	valueChanged       chan<- []sim.SimVar
+	valueChanged       chan<- SimData
 	valueChangeRequest <-chan event.Event
 }
 
-func NewSimConnectController(valueChanged chan<- []sim.SimVar, valueChangeRequest <-chan event.Event) *Controller {
+func NewSimConnectController(valueChanged chan<- SimData, valueChangeRequest <-chan event.Event) *Controller {
 	return &Controller{
 		shutdown:           make(chan bool),
 		valueChanged:       valueChanged,
@@ -81,11 +81,7 @@ func (c *Controller) serverMainLoop() error {
 		}
 	}
 
-	log.Println("Connecting to vars")
-	cSimVar, err := sc.ConnectToSimVar(
-		sim.SimVarAutopilotMaster(INDEX_AUTOPILOT_MASTER),
-		sim.SimVarAutopilotYawDamper(INDEX_AUTOPILOT_YAW_DAMPER),
-	)
+	cSimVar, err := c.connectVars(sc)
 	if err != nil {
 		return err
 	}
@@ -95,19 +91,28 @@ func (c *Controller) serverMainLoop() error {
 		select {
 		case status := <-cSimStatus:
 			log.Printf("Simulator status changed %v\n", status)
-		case result := <-cSimVar:
-			select { // use a timeout in case the reader fails
-			case c.valueChanged <- result:
-			case <-time.After(time.Second * 5):
+			if status {
+				// reconnect
+				cSimVar, err = c.connectVars(sc)
+				if err != nil {
+					return err
+				}
+			}
+		case iFace := (<-cSimVar):
+			if result, ok := iFace.(SimData); ok {
+				select { // use a timeout in case the reader fails
+				case c.valueChanged <- result:
+				case <-time.After(time.Second * 5):
+				}
 			}
 		case request := <-c.valueChangeRequest:
-			switch request.Index {
-			case INDEX_AUTOPILOT_MASTER:
+			switch request.Name {
+			case AutopilotMaster:
 				select {
 				case <-autopilotEnable(sc, request.Value == true):
 				case <-time.After(time.Second * 5):
 				}
-			case INDEX_AUTOPILOT_YAW_DAMPER:
+			case YawDamper:
 				select {
 				case <-yawDamperEnable(sc, request.Value == true):
 				case <-time.After(time.Second * 5):
@@ -121,6 +126,10 @@ func (c *Controller) serverMainLoop() error {
 			return nil
 		}
 	}
+}
+
+func (c *Controller) connectVars(sc *sim.EasySimConnect) (<-chan interface{}, error) {
+	return sc.ConnectInterfaceToSimVar(SimData{})
 }
 
 func autopilotEnable(sc *sim.EasySimConnect, enabled bool) <-chan int32 {

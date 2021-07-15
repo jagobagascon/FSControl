@@ -17,18 +17,18 @@ var evtSource = new EventSource("/subscribe");
 evtSource.onmessage = function(e) {
     let d = JSON.parse(e.data)
     // set value using vue to update the UI
-    Vue.set(app.values, d.Index, d.Value)
+    app.values = d
 }
 
 
-function postValueChanged(index, value) {
+function postValueChanged(name, value) {
     var opts = {
         method: 'POST',
         cache: 'no-cache',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: "index=" + index + "&value=" + value,
+        body: "name=" + name + "&value=" + value,
     };
 
     fetch('/value-change-request', opts).then(function (response) {

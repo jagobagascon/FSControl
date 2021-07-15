@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/jagobagascon/FSControl/internal/event"
-	sim "github.com/micmonay/simconnect"
+	"github.com/jagobagascon/FSControl/internal/simconnect"
 )
 
 type Server struct {
@@ -24,31 +24,31 @@ type Server struct {
 	//SSE
 
 	// New events are sent to this channel
-	valueChanged <-chan []sim.SimVar
+	valueChanged <-chan simconnect.SimData
 
 	// New client connections
-	newClients chan chan []sim.SimVar
+	newClients chan chan simconnect.SimData
 
 	// Closed client connections
-	closingClients chan chan []sim.SimVar
+	closingClients chan chan simconnect.SimData
 
 	// Client connections registry
-	clients map[chan []sim.SimVar]bool
+	clients map[chan simconnect.SimData]bool
 }
 
-func NewServer(valueChanged <-chan []sim.SimVar, valueChangeRequests chan<- event.Event) *Server {
+func NewServer(valueChanged <-chan simconnect.SimData, valueChangeRequests chan<- event.Event) *Server {
 	// Starts simconnect service
 	return &Server{
 		httpServer: &http.Server{
-			Addr: ":8080",
+			Addr: "localhost:8080",
 		},
 		shutdown: make(chan bool),
 
 		valueChangeRequests: valueChangeRequests,
 		valueChanged:        valueChanged,
-		newClients:          make(chan chan []sim.SimVar),
-		closingClients:      make(chan chan []sim.SimVar),
-		clients:             make(map[chan []sim.SimVar]bool),
+		newClients:          make(chan chan simconnect.SimData),
+		closingClients:      make(chan chan simconnect.SimData),
+		clients:             make(map[chan simconnect.SimData]bool),
 	}
 }
 
@@ -91,10 +91,10 @@ func (s *Server) valueChangeRequest(w http.ResponseWriter, req *http.Request) {
 
 	// get values
 	req.ParseForm()
-	i, _ := strconv.Atoi(req.PostForm["index"][0])
+	n := req.PostForm["name"][0]
 	v, _ := strconv.ParseBool(req.PostForm["value"][0])
 	select { // use a timeout in case the reader fails
-	case s.valueChangeRequests <- event.Event{Index: i, Value: v}:
+	case s.valueChangeRequests <- event.Event{Name: n, Value: v}:
 	case <-time.After(time.Second * 5):
 	}
 
@@ -160,7 +160,7 @@ func (s *Server) serverEvents(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	// Each connection registers its own message channel with the Broker's connections registry
-	messageChan := make(chan []sim.SimVar)
+	messageChan := make(chan simconnect.SimData)
 
 	log.Println("Signal new connection to broker")
 	// Signal the broker that we have a new connection
@@ -182,21 +182,12 @@ func (s *Server) serverEvents(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		for _, simVar := range result {
-			v, _ := simVar.GetBool()
-			e := event.Event{
-				Index: simVar.Index,
-				Value: v,
-			}
-
-			jsonData, err := json.Marshal(e)
-			if err != nil {
-				log.Printf("Error marshalling event: %v\n", e)
-			}
-
-			fmt.Fprintf(w, "data: %s\n\n", jsonData)
-
+		jsonData, err := json.Marshal(result)
+		if err != nil {
+			log.Printf("Error marshalling event: %v\n", result)
 		}
+
+		fmt.Fprintf(w, "data: %s\n\n", jsonData)
 
 		// Flush the data immediatly instead of buffering it for later.
 		flusher.Flush()

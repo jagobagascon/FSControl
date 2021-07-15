@@ -9,8 +9,6 @@ import (
 	"github.com/jagobagascon/FSControl/internal/event"
 	"github.com/jagobagascon/FSControl/internal/simconnect"
 	"github.com/jagobagascon/FSControl/internal/ui"
-
-	sim "github.com/micmonay/simconnect"
 )
 
 type Server struct {
@@ -20,7 +18,7 @@ type Server struct {
 
 func NewServer() *Server {
 	// Starts simconnect service
-	simValueChanged := make(chan []sim.SimVar)
+	simValueChanged := make(chan simconnect.SimData)
 	simValueRequest := make(chan event.Event)
 	return &Server{
 		uiServer:   ui.NewServer(simValueChanged, simValueRequest),
