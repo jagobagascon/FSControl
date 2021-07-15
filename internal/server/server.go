@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"sync"
 
+	"github.com/jagobagascon/FSControl/internal/event"
 	"github.com/jagobagascon/FSControl/internal/simconnect"
 	"github.com/jagobagascon/FSControl/internal/ui"
 
@@ -20,9 +21,10 @@ type Server struct {
 func NewServer() *Server {
 	// Starts simconnect service
 	simValueChanged := make(chan []sim.SimVar)
+	simValueRequest := make(chan event.Event)
 	return &Server{
-		uiServer:   ui.NewServer(simValueChanged),
-		simconnect: simconnect.NewSimConnectController(simValueChanged),
+		uiServer:   ui.NewServer(simValueChanged, simValueRequest),
+		simconnect: simconnect.NewSimConnectController(simValueChanged, simValueRequest),
 	}
 }
 
@@ -39,8 +41,8 @@ func (s *Server) Run() error {
 
 	<-stop
 
-	s.uiServer.Stop()
 	s.simconnect.Stop()
+	s.uiServer.Stop()
 
 	// Wait for gracefull stop
 	log.Println("Shutting down....")

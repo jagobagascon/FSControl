@@ -1,12 +1,40 @@
+:root {
+    --text-color: #eee;
+    --text-color-inactive: #eee5;
+    
+    --background-color: #111;
+    --shadow-active: 0px 0px 0px 3px #FFF5;
+    --blue: #1e90ff;
+    --white: #ffffff;
+}
+
+
 * {
     margin: 0;
     padding: 0;
 }
 
 html, body {
-    background-color: #111;
+    background-color: var(--background-color, #eee);
     width: 100%;
-    color: #eee;
+    color: var(--text-color, #eee);
+}
+
+button {
+    color:  var(--text-color-inactive, #eee);
+    background-color: var(--background-color);
+    border-radius: 1rem;
+    border: none;
+    transition: all 250ms;
+}
+
+button.active {
+    box-shadow: var(--shadow-active);
+    color: var(--text-color);
+}
+
+button > * {
+    transition: color 250ms;
 }
 
 /*********************
@@ -24,6 +52,7 @@ html, body {
 }
 
 .grid-container > * {
+    position: relative;
     background-color: #222;
 }
 .row--2x { grid-row-end: span 2; }

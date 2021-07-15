@@ -1,33 +1,37 @@
+
 var app = new Vue({
     el: '#app',
     data: {
-        components: [
-            "c0",
-            "c1",
-            "c2",
-            "c3",
-            "c4",
-            "c5",
-            "c6",
-            "c7",
-            "c8",
-            "c9",
-            "c10",
-            "c11",
-            "c12",
-            "c13",
-            "c14",
-            "c15",
-            "c16",
-            "c17",
-            "c18",
-            "c19",
-        ],
+        "values": {}
+    },
+    methods: {
+        onValueChanged: function(index, newValue) {
+            console.info("Value of index " + index + " changed to " + newValue)
+            // send the value to the server
+            postValueChanged(index, newValue)
+        }
     }
 });
 
 var evtSource = new EventSource("/subscribe");
 evtSource.onmessage = function(e) {
-    console.info(e)
+    let d = JSON.parse(e.data)
+    // set value using vue to update the UI
+    Vue.set(app.values, d.Index, d.Value)
 }
-  
+
+
+function postValueChanged(index, value) {
+    var opts = {
+        method: 'POST',
+        cache: 'no-cache',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: "index=" + index + "&value=" + value,
+    };
+
+    fetch('/value-change-request', opts).then(function (response) {
+        // ignore
+    })      
+}

@@ -6,15 +6,20 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 
+	"github.com/jagobagascon/FSControl/internal/event"
 	sim "github.com/micmonay/simconnect"
 )
 
 type Server struct {
 	httpServer *http.Server
 	shutdown   chan bool
+
+	// change requests from ui to server
+	valueChangeRequests chan<- event.Event
 
 	//SSE
 
@@ -31,24 +36,19 @@ type Server struct {
 	clients map[chan []sim.SimVar]bool
 }
 
-type Event struct {
-	// defining struct variables
-	Index int
-	Value string
-}
-
-func NewServer(valueChanged <-chan []sim.SimVar) *Server {
+func NewServer(valueChanged <-chan []sim.SimVar, valueChangeRequests chan<- event.Event) *Server {
 	// Starts simconnect service
 	return &Server{
 		httpServer: &http.Server{
-			Addr: "localhost:8080",
+			Addr: ":8080",
 		},
 		shutdown: make(chan bool),
 
-		valueChanged:   valueChanged,
-		newClients:     make(chan chan []sim.SimVar),
-		closingClients: make(chan chan []sim.SimVar),
-		clients:        make(map[chan []sim.SimVar]bool),
+		valueChangeRequests: valueChangeRequests,
+		valueChanged:        valueChanged,
+		newClients:          make(chan chan []sim.SimVar),
+		closingClients:      make(chan chan []sim.SimVar),
+		clients:             make(map[chan []sim.SimVar]bool),
 	}
 }
 
@@ -64,6 +64,7 @@ func (s *Server) listenAndServe(wg *sync.WaitGroup) {
 
 	// Starts web UI server
 	http.HandleFunc("/", s.index)
+	http.HandleFunc("/value-change-request", s.valueChangeRequest)
 	http.HandleFunc("/subscribe", s.serverEvents)
 
 	if err := s.httpServer.ListenAndServe(); err != http.ErrServerClosed {
@@ -71,6 +72,36 @@ func (s *Server) listenAndServe(wg *sync.WaitGroup) {
 		log.Fatalf("ListenAndServe(): %v", err)
 	}
 }
+
+func (s *Server) Stop() {
+	s.shutdown <- true
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	s.httpServer.Shutdown(ctx)
+	log.Println("Shuting down http server")
+}
+
+func (s *Server) index(w http.ResponseWriter, req *http.Request) {
+	log.Println("Received request for " + req.URL.Path)
+	http.ServeFile(w, req, "web"+req.URL.Path)
+}
+
+func (s *Server) valueChangeRequest(w http.ResponseWriter, req *http.Request) {
+	log.Println("Received request for " + req.URL.Path)
+
+	// get values
+	req.ParseForm()
+	i, _ := strconv.Atoi(req.PostForm["index"][0])
+	v, _ := strconv.ParseBool(req.PostForm["value"][0])
+	select { // use a timeout in case the reader fails
+	case s.valueChangeRequests <- event.Event{Index: i, Value: v}:
+	case <-time.After(time.Second * 5):
+	}
+
+	fmt.Fprintln(w, "ok")
+}
+
+// SSE
 
 func (s *Server) processChangedValuesLoop(wg *sync.WaitGroup) {
 	defer wg.Done() // let main know we are done cleaning up
@@ -109,19 +140,6 @@ func (s *Server) processChangedValuesLoop(wg *sync.WaitGroup) {
 
 		}
 	}
-}
-
-func (s *Server) Stop() {
-	s.shutdown <- true
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancel()
-	s.httpServer.Shutdown(ctx)
-	log.Println("Shuting down http server")
-}
-
-func (s *Server) index(w http.ResponseWriter, req *http.Request) {
-	log.Println("Received request for " + req.URL.Path)
-	http.ServeFile(w, req, "web"+req.URL.Path)
 }
 
 func (s *Server) serverEvents(w http.ResponseWriter, req *http.Request) {
@@ -166,9 +184,9 @@ func (s *Server) serverEvents(w http.ResponseWriter, req *http.Request) {
 
 		for _, simVar := range result {
 			v, _ := simVar.GetBool()
-			e := Event{
+			e := event.Event{
 				Index: simVar.Index,
-				Value: fmt.Sprintf("%v", v),
+				Value: v,
 			}
 
 			jsonData, err := json.Marshal(e)

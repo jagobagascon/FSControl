@@ -5,19 +5,22 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jagobagascon/FSControl/internal/event"
 	sim "github.com/micmonay/simconnect"
 )
 
 type Controller struct {
 	shutdown chan bool
 
-	valueChanged chan<- []sim.SimVar
+	valueChanged       chan<- []sim.SimVar
+	valueChangeRequest <-chan event.Event
 }
 
-func NewSimConnectController(valueChanged chan<- []sim.SimVar) *Controller {
+func NewSimConnectController(valueChanged chan<- []sim.SimVar, valueChangeRequest <-chan event.Event) *Controller {
 	return &Controller{
-		shutdown:     make(chan bool),
-		valueChanged: valueChanged,
+		shutdown:           make(chan bool),
+		valueChanged:       valueChanged,
+		valueChangeRequest: valueChangeRequest,
 	}
 }
 
@@ -81,27 +84,60 @@ func (c *Controller) serverMainLoop() error {
 	log.Println("Connecting to vars")
 	cSimVar, err := sc.ConnectToSimVar(
 		sim.SimVarAutopilotMaster(INDEX_AUTOPILOT_MASTER),
+		sim.SimVarAutopilotYawDamper(INDEX_AUTOPILOT_YAW_DAMPER),
 	)
 	if err != nil {
 		return err
 	}
 
-	log.Println("Connecting to crash")
-	crashed := sc.ConnectSysEventCrashed()
-
-	//log.Println("Connecting to throtle")
-	//throtleFull := sc.NewSimEvent(sim.KeyThrottleFull)
-
 	// main event loop
 	for {
 		select {
+		case status := <-cSimStatus:
+			log.Printf("Simulator status changed %v\n", status)
 		case result := <-cSimVar:
-			c.valueChanged <- result
-		case <-crashed:
-			log.Println("Plane crashed")
+			select { // use a timeout in case the reader fails
+			case c.valueChanged <- result:
+			case <-time.After(time.Second * 5):
+			}
+		case request := <-c.valueChangeRequest:
+			switch request.Index {
+			case INDEX_AUTOPILOT_MASTER:
+				select {
+				case <-autopilotEnable(sc, request.Value == true):
+				case <-time.After(time.Second * 5):
+				}
+			case INDEX_AUTOPILOT_YAW_DAMPER:
+				select {
+				case <-yawDamperEnable(sc, request.Value == true):
+				case <-time.After(time.Second * 5):
+				}
+			}
 		case <-c.shutdown:
-			<-sc.Close()
+			select {
+			case <-sc.Close():
+			case <-time.After(time.Second * 5):
+			}
 			return nil
 		}
 	}
+}
+
+func autopilotEnable(sc *sim.EasySimConnect, enabled bool) <-chan int32 {
+	if enabled {
+		autopilotOn := sc.NewSimEvent(sim.KeyAutopilotOn)
+		return autopilotOn.Run()
+	} else {
+		autopilotOff := sc.NewSimEvent(sim.KeyAutopilotOff)
+		return autopilotOff.Run()
+	}
+}
+
+func yawDamperEnable(sc *sim.EasySimConnect, enabled bool) <-chan int32 {
+	ydSet := sc.NewSimEvent(sim.KeyYawDamperSet)
+	enabledValue := 0
+	if enabled {
+		enabledValue = 1
+	}
+	return ydSet.RunWithValue(enabledValue)
 }
