@@ -1,9 +1,13 @@
 :root {
     --text-color: #eee;
     --text-color-inactive: #eee5;
+
+    --indicator-color: #eee;
+    --indicator-color-inactive: #eee1;
     
     --background-color: #111;
-    --shadow-active: 0px 0px 0px 3px #FFF5;
+    --shadow-active: 0px -1px 0px 1px #0009 inset, 0px 0px 3px 0px #FFF9;
+    --shadow-inactive: 0px -5px 0px 1px #0009 inset, 0px 4px 0px 0px #FFF0;
     --blue: #1e90ff;
     --white: #ffffff;
 }
@@ -25,16 +29,32 @@ button {
     background-color: var(--background-color);
     border-radius: 1rem;
     border: none;
-    transition: all 250ms;
+    transition: all 150ms;
+    transition-delay: box-shadow 200ms;
+    box-shadow: var(--shadow-inactive);
 }
+
 
 button.active {
     box-shadow: var(--shadow-active);
     color: var(--text-color);
+    text-shadow: 0px 0px 3px var(--text-color);
 }
 
-button > * {
-    transition: color 250ms;
+button .indicator {
+    transition: all 300ms;
+    width: 60%;
+    margin-left: 20%;
+    margin-top: 1rem;
+    background-color: var(--indicator-color-inactive);
+    height: .5rem;
+    border-radius: .25rem;
+}
+
+button.active .indicator {
+    transition-delay: 200ms;
+    background-color: var(--indicator-color);
+    box-shadow: 0px 0px 5px 0px var(--indicator-color);
 }
 
 /*********************

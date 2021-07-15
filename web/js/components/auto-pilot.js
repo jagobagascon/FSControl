@@ -28,6 +28,7 @@ Vue.component('auto-pilot', {
                 "width": "30%",
                 "font-weight": "bold",
                 "font-size": "1.1rem",
+                "margin": ".5rem",
             }
         },
     },
@@ -37,11 +38,13 @@ Vue.component('auto-pilot', {
                     v-bind:style="buttonStyle"
                     v-on:click="$emit('value-changed', indexAutopilotMaster, !apEnabled)">
                 A/P
+                <div class="indicator"></div>
             </button>
             <button v-bind:class="{active: ydEnabled}" 
                     v-bind:style="buttonStyle"
                     v-on:click="$emit('value-changed', indexYawDamper, !ydEnabled)">
                 YD
+                <div class="indicator"></div>
             </button>
         </div>
     `
