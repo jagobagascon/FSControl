@@ -16,19 +16,18 @@ Vue.component('auto-pilot', {
             return {
                 "width": "100%",
                 "height": "100%",
-                "display": "flex",
-                "justify-content": "center",
-                "align-items": "center",
+                "display": "grid",
+                "grid-auto-rows": "100px", // button size
+                "grid-template-columns": "repeat(auto-fill, minmax(60px, 1fr))",
+                "grid-gap": "0.5em",
+                "padding": "10px",
             }
         },
         buttonStyle: function() {
             return {
                 "display": "inline-block",
-                "height": "40%",
-                "width": "30%",
                 "font-weight": "bold",
                 "font-size": "1.1rem",
-                "margin": ".5rem",
             }
         },
     },
