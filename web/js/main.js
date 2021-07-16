@@ -21,6 +21,7 @@ evtSource.onmessage = function(e) {
 }
 
 
+// value might be empty
 function postValueChanged(name, value) {
     var opts = {
         method: 'POST',
@@ -28,8 +29,11 @@ function postValueChanged(name, value) {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: "name=" + name + "&value=" + value,
+        body: "name=" + name
     };
+    if (value !== undefined) {
+        opts.body += "&value=" + value
+    }
 
     fetch('/value-change-request', opts).then(function (response) {
         // ignore

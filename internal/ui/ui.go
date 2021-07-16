@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/jagobagascon/FSControl/internal/event"
-	"github.com/jagobagascon/FSControl/internal/simconnect"
+	"github.com/jagobagascon/FSControl/internal/simdata"
 )
 
 type Server struct {
@@ -24,31 +24,31 @@ type Server struct {
 	//SSE
 
 	// New events are sent to this channel
-	valueChanged <-chan simconnect.SimData
+	valueChanged <-chan simdata.SimData
 
 	// New client connections
-	newClients chan chan simconnect.SimData
+	newClients chan chan simdata.SimData
 
 	// Closed client connections
-	closingClients chan chan simconnect.SimData
+	closingClients chan chan simdata.SimData
 
 	// Client connections registry
-	clients map[chan simconnect.SimData]bool
+	clients map[chan simdata.SimData]bool
 }
 
-func NewServer(valueChanged <-chan simconnect.SimData, valueChangeRequests chan<- event.Event) *Server {
-	// Starts simconnect service
+func NewServer(valueChanged <-chan simdata.SimData, valueChangeRequests chan<- event.Event) *Server {
+	// Starts simdata service
 	return &Server{
 		httpServer: &http.Server{
-			Addr: "localhost:8080",
+			Addr: ":8080",
 		},
 		shutdown: make(chan bool),
 
 		valueChangeRequests: valueChangeRequests,
 		valueChanged:        valueChanged,
-		newClients:          make(chan chan simconnect.SimData),
-		closingClients:      make(chan chan simconnect.SimData),
-		clients:             make(map[chan simconnect.SimData]bool),
+		newClients:          make(chan chan simdata.SimData),
+		closingClients:      make(chan chan simdata.SimData),
+		clients:             make(map[chan simdata.SimData]bool),
 	}
 }
 
@@ -92,9 +92,20 @@ func (s *Server) valueChangeRequest(w http.ResponseWriter, req *http.Request) {
 	// get values
 	req.ParseForm()
 	n := req.PostForm["name"][0]
-	v, _ := strconv.ParseBool(req.PostForm["value"][0])
+	v := 0
+	hasval := false
+	if val, ok := req.PostForm["value"]; ok {
+		// has value
+		b, _ := strconv.ParseBool(val[0])
+		if b {
+			v = 1
+		} else {
+			v = 0
+		}
+		hasval = true
+	}
 	select { // use a timeout in case the reader fails
-	case s.valueChangeRequests <- event.Event{Name: n, Value: v}:
+	case s.valueChangeRequests <- event.Event{Name: n, Value: v, HasValue: hasval}:
 	case <-time.After(time.Second * 5):
 	}
 
@@ -160,7 +171,7 @@ func (s *Server) serverEvents(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	// Each connection registers its own message channel with the Broker's connections registry
-	messageChan := make(chan simconnect.SimData)
+	messageChan := make(chan simdata.SimData)
 
 	log.Println("Signal new connection to broker")
 	// Signal the broker that we have a new connection

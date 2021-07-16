@@ -1,13 +1,15 @@
-// auto-pilot component
-Vue.component('auto-pilot', {
+// flap-control component
+Vue.component('flap-control', {
     props: [
         "values"
     ],
     data: function() {
         return {
             // reads
-            keyAutopilotMaster: "AutopilotMaster",
-            keyYawDamper: "YawDamper",
+            keyFlapsAvail: "FlapsAvail",
+            keyFlapsCurrent: "FlapsCurrent",
+            keyFlapsPercent: "FlapsPercent",
+            keyFlapsPositions: "FlapsPositions",
             //writes
             keyAutopilotOn: "AUTOPILOT_ON",
             keyAutopilotOff: "AUTOPILOT_OFF",
@@ -40,13 +42,13 @@ Vue.component('auto-pilot', {
         <div v-bind:style="containerStyle">
             <button v-bind:class="{active: apEnabled}" 
                     v-bind:style="buttonStyle"
-                    v-on:click="$emit('value-changed', apEnabled ? keyAutopilotOff : keyAutopilotOn)">
+                    v-on:click="$emit('value-changed', keyAutopilotMaster, !apEnabled)">
                 A/P
                 <div class="indicator"></div>
             </button>
             <button v-bind:class="{active: ydEnabled}" 
                     v-bind:style="buttonStyle"
-                    v-on:click="$emit('value-changed', keyYawDamperSet, !ydEnabled)">
+                    v-on:click="$emit('value-changed', keyYawDamper, !ydEnabled)">
                 YD
                 <div class="indicator"></div>
             </button>

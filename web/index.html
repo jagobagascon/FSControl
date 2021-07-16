@@ -22,6 +22,7 @@
         <div class="grid-container">
             <div class="grid-item">
                 <auto-pilot 
+                    v-if="values.AutopilotAvailable"
                     v-bind:values="values"
                     v-on:value-changed="onValueChanged"></auto-pilot>
             </div>

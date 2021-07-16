@@ -7,22 +7,27 @@ import (
 	"sync"
 
 	"github.com/jagobagascon/FSControl/internal/event"
-	"github.com/jagobagascon/FSControl/internal/simconnect"
+	"github.com/jagobagascon/FSControl/internal/simdata"
 	"github.com/jagobagascon/FSControl/internal/ui"
 )
 
 type Server struct {
-	uiServer   *ui.Server
-	simconnect *simconnect.Controller
+	uiServer      *ui.Server
+	simcontroller *simdata.Controller
+
+	simValueChanged chan simdata.SimData
+	simValueRequest chan event.Event
 }
 
 func NewServer() *Server {
-	// Starts simconnect service
-	simValueChanged := make(chan simconnect.SimData)
+	// Starts simcontroller service
+	simValueChanged := make(chan simdata.SimData)
 	simValueRequest := make(chan event.Event)
 	return &Server{
-		uiServer:   ui.NewServer(simValueChanged, simValueRequest),
-		simconnect: simconnect.NewSimConnectController(simValueChanged, simValueRequest),
+		uiServer:        ui.NewServer(simValueChanged, simValueRequest),
+		simcontroller:   simdata.NewSimController(simValueChanged, simValueRequest),
+		simValueChanged: simValueChanged,
+		simValueRequest: simValueRequest,
 	}
 }
 
@@ -30,21 +35,26 @@ func (s *Server) Run() error {
 	serverExitDone := &sync.WaitGroup{}
 
 	s.uiServer.Run(serverExitDone)
-	s.simconnect.Run(serverExitDone)
+	s.simcontroller.Run(serverExitDone)
 
 	// capture ctrl+c
 	// Setting up signal capturing
 	stop := make(chan os.Signal, 1)
+	defer close(stop)
+
 	signal.Notify(stop, os.Interrupt)
 
 	<-stop
 
-	s.simconnect.Stop()
+	s.simcontroller.Stop()
 	s.uiServer.Stop()
 
 	// Wait for gracefull stop
 	log.Println("Shutting down....")
 	serverExitDone.Wait()
+
+	close(s.simValueChanged)
+	close(s.simValueRequest)
 
 	return nil
 }
