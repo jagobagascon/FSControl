@@ -14,10 +14,13 @@ type SimData struct {
 
 	AutopilotAlt    bool    `sim:"AUTOPILOT ALTITUDE LOCK"`
 	AutopilotAltVar float64 `sim:"AUTOPILOT ALTITUDE LOCK VAR" simUnit:"Feet"`
-	Alt             float64 `sim:"INDICATED ALTITUDE" simUnit:"Feet"`
+	CurrentAlt      float64 `sim:"INDICATED ALTITUDE" simUnit:"Feet"`
 
 	AutopilotVS    bool    `sim:"AUTOPILOT VERTICAL HOLD"`
 	AutopilotVSVar float64 `sim:"AUTOPILOT VERTICAL HOLD VAR" simUnit:"Feet/minute"`
+
+	AutopilotHdg    bool    `sim:"AUTOPILOT HEADING LOCK"`
+	AutopilotHdgVar float64 `sim:"AUTOPILOT HEADING LOCK DIR" simUnit:"Degrees"`
 
 	LeverPos1 float64 `sim:"GENERAL ENG THROTTLE LEVER POSITION:1"`
 	LeverPos2 float64 `sim:"GENERAL ENG THROTTLE LEVER POSITION:2"`
