@@ -75,6 +75,9 @@ Vue.component('fs-knob', {
                 am = (x + y) * 5;
             }
 
+            // normalize am with the step
+            am = am * this.step / 100;
+
             this.angle += am
             this.accumulated += am
             if (Math.abs(this.accumulated) >= this.step) {
@@ -87,13 +90,8 @@ Vue.component('fs-knob', {
     template: `
         <div v-bind:style="knobContainerStyle"
                 v-bind:class="{active: active}">
-                <div class="knob-display">
-                    <transition name="fade">
-                        <span v-if="target != value">
-                            {{ target }} -> 
-                        </span>
-                    </transition>
-                    {{ value }}
+                <div class="knob-display" v-bind:class="{current: target == value}">
+                    {{ target }}
                 </div>
 
                 <div class="knob"
