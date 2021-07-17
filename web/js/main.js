@@ -2,7 +2,20 @@
 var app = new Vue({
     el: '#app',
     data: {
-        "values": {}
+        "values": {/*
+            "AutopilotAlt": false,
+            "AutopilotAltVar": 4700,
+            "AutopilotAvailable": true,
+            "AutopilotMaster": false,
+            "Alt": 800.12,
+            "FlapsAvail": true,
+            "FlapsCurrent": 1,
+            "FlapsPercent": 0.5,
+            "FlapsPositions": 2,
+            "LeverPos1": 0,
+            "LeverPos2": 0,
+            "YawDamper": false,*/
+        }
     },
     methods: {
         onValueChanged: function(index, newValue) {

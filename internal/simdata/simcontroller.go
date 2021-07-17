@@ -121,18 +121,18 @@ func (c *Controller) serverMainLoop() error {
 			if request.HasValue {
 				select {
 				case <-e.RunWithValue(request.Value):
-				case <-time.After(time.Millisecond * 100):
+				case <-time.After(time.Millisecond * 150):
 				}
 			} else {
 				select {
 				case <-e.Run():
-				case <-time.After(time.Millisecond * 100):
+				case <-time.After(time.Millisecond * 150):
 				}
 			}
 		case <-c.shutdown:
 			select {
 			case stop <- true:
-			case <-time.After(time.Millisecond * 100):
+			case <-time.After(time.Millisecond * 150):
 			}
 			return c.mate.Close()
 		}

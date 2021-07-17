@@ -92,21 +92,17 @@ func (s *Server) valueChangeRequest(w http.ResponseWriter, req *http.Request) {
 	// get values
 	req.ParseForm()
 	n := req.PostForm["name"][0]
-	v := 0
+	var v int = 0
 	hasval := false
 	if val, ok := req.PostForm["value"]; ok {
 		// has value
-		b, _ := strconv.ParseBool(val[0])
-		if b {
-			v = 1
-		} else {
-			v = 0
-		}
+		v, _ = strconv.Atoi(val[0])
 		hasval = true
 	}
+	log.Println(n, v, hasval)
 	select { // use a timeout in case the reader fails
 	case s.valueChangeRequests <- event.Event{Name: n, Value: v, HasValue: hasval}:
-	case <-time.After(time.Second * 5):
+	case <-time.After(time.Millisecond * 200):
 	}
 
 	fmt.Fprintln(w, "ok")
