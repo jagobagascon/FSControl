@@ -22,6 +22,11 @@ var app = new Vue({
             console.info("Value of index " + index + " changed to " + newValue + (strict ? "(strict)" : ""))
             // send the value to the server
             postValueChanged(index, newValue, strict)
+        },
+        onFullScreenPressed: function() {
+            if (this.$el.requestFullscreen) {
+                this.$el.requestFullscreen();
+            }
         }
     }
 });

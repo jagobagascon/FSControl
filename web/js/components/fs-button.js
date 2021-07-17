@@ -30,7 +30,8 @@ Vue.component('fs-button', {
         },
     },
     template: `
-        <button v-bind:class="{active: active}" 
+        <button class="panel-button"
+                v-bind:class="{active: active}" 
                 v-bind:style="buttonStyle"
                 v-on="inputListeners">
             <slot></slot>

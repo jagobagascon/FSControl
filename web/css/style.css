@@ -12,7 +12,6 @@
     --white: #ffffff;
 }
 
-
 * {
     margin: 0;
     padding: 0;
@@ -26,7 +25,23 @@ html, body {
     color: var(--text-color, #eee);
 }
 
-button, .knob {
+#full-screen-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.5rem;
+}
+
+#full-screen-button > button {
+    border: none;
+    background-color: #666;
+    border-radius: 999px;
+    color: white;
+    padding: 0.4rem;
+    line-height: 0.8rem;
+}
+
+.panel-button, .knob {
     color:  var(--text-color-inactive, #eee);
     background-color: var(--background-color);
     border-radius: 1rem;
@@ -37,7 +52,7 @@ button, .knob {
 }
 
 
-button.active, .knob.active {
+.panel-button.active, .knob.active {
     box-shadow: var(--shadow-active);
     color: var(--text-color);
     text-shadow: 0px 0px 3px var(--text-color);
@@ -54,7 +69,7 @@ button.active, .knob.active {
     box-shadow: 0px 0px 5px 0px var(--indicator-color);
 }
 
-button .indicator {
+.panel-button .indicator {
     width: 60%;
     margin-left: 20%;
     margin-top: 1rem;
