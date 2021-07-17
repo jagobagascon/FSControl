@@ -5,6 +5,7 @@ Vue.component('auto-pilot', {
     ],
     data: function() {
         return {
+            // autopilot
             // reads
             keyAutopilotMaster: "AutopilotMaster",
 
@@ -15,35 +16,33 @@ Vue.component('auto-pilot', {
 
             keyAutopilotVS: "AutopilotVS",
             keyAutopilotVSVar: "AutopilotVSVar",
+            keyCurrentAlt: "CurrentAlt",
+
+            keyAutopilotHdg: "AutopilotHdg",
+            keyAutopilotHdgVar: "AutopilotHdgVar",
+
             //writes
-            keyAutopilotOn: "AUTOPILOT_ON",
-            keyAutopilotOff: "AUTOPILOT_OFF",
+            evAutopilotOn: "AUTOPILOT_ON",
+            evAutopilotOff: "AUTOPILOT_OFF",
 
-            keyYawDamperSet: "YAW_DAMPER_SET",
+            evYawDamperSet: "YAW_DAMPER_SET",
 
-            keyAutopilotAltOn: "AP_PANEL_ALTITUDE_ON",
-            keyAutopilotAltOff: "AP_PANEL_ALTITUDE_OFF",
-            keyAutopilotAltSet: "AP_ALT_VAR_SET_ENGLISH",
+            evAutopilotAltOn: "AP_PANEL_ALTITUDE_ON",
+            evAutopilotAltOff: "AP_PANEL_ALTITUDE_OFF",
+            evAutopilotAltSet: "AP_ALT_VAR_SET_ENGLISH",
 
-            keyAutopilotVSOn: "AP_PANEL_VS_ON",
-            keyAutopilotVSOff: "AP_PANEL_VS_OFF",
-            keyAutopilotVSSet: "AP_VS_VAR_SET_ENGLISH",
+            evAutopilotVSOn: "AP_PANEL_VS_ON",
+            evAutopilotVSOff: "AP_PANEL_VS_OFF",
+            evAutopilotVSSet: "AP_VS_VAR_SET_ENGLISH",
             
+            evAutopilotHdgOn: "AP_HDG_HOLD_ON",
+            evAutopilotHdgOff: "AP_HDG_HOLD_OFF",
+            evAutopilotHdgSet: "HEADING_BUG_SET",
 
+            // other
             targetAltVal: null,
             targetVSVal: null,
-        }
-    },
-    watch: {
-        'values.AutopilotAltVar': function(newVal, oldVal) {
-            // reset target values
-            console.info(newVal, oldVal)
-            this.targetAltVal = this.values[this.keyAutopilotAltVar];
-        },
-        'values.AutopilotVSVar': function(newVal, oldVal) {
-            // reset target values
-            console.info(newVal, oldVal)
-            this.targetVSVal = this.values[this.keyAutopilotVSVar];
+            targetHdgVal: null,
         }
     },
     computed: {
@@ -51,6 +50,7 @@ Vue.component('auto-pilot', {
         ydEnabled: function() { return this.values[this.keyYawDamper] == true },
         altEnabled: function() { return this.values[this.keyAutopilotAlt] == true },
         vsEnabled: function() { return this.values[this.keyAutopilotVS] == true },
+        hdgEnabled: function() { return this.values[this.keyAutopilotHdg] == true },
         targetAlt: function() {
             if (this.targetAltVal == null) {
                 this.targetAltVal = this.values[this.keyAutopilotAltVar];
@@ -65,13 +65,21 @@ Vue.component('auto-pilot', {
              
              return this.targetVSVal;
         },
+        targetHdg: function() {
+            if (this.targetHdgVal == null) {
+                this.targetHdgVal = this.values[this.keyAutopilotHdgVar];
+             }
+             
+             this.targetHdgVal = this.targetHdgVal % 360;
+             return this.targetHdgVal;
+        },
         containerStyle: function() {
             return {
                 "width": "100%",
                 "height": "100%",
                 "display": "grid",
-                "grid-auto-rows": "100px", // button size
-                "grid-template-columns": "repeat(auto-fill, minmax(60px, 1fr))",
+                "grid-template-columns": "repeat(7, 1fr)",
+                "grid-template-rows": "repeat(2, 1fr)",
                 "grid-gap": "0.5em",
                 "padding": "10px",
             }
@@ -80,43 +88,72 @@ Vue.component('auto-pilot', {
     methods: {
         altChanged: function(delta) {
             // debounce the event to not send so too many of them
-            clearTimeout(this.debounceChange)
+            clearTimeout(this.debounceChangeAlt)
             this.targetAltVal += delta;
-            this.debounceChange = setTimeout(() => {
-                this.$emit('value-changed', this.keyAutopilotAltSet, this.targetAltVal)
-            }, 100)
+            this.debounceChangeAlt = setTimeout(() => {
+                this.$emit('value-changed', this.evAutopilotAltSet, this.targetAlt)
+            }, 200)
         },
         vsChanged: function(delta) {
             if (!this.vsEnabled) {
                 return
             }
             // debounce the event to not send so too many of them
-            clearTimeout(this.debounceChange)
+            clearTimeout(this.debounceChangeVS)
             this.targetVSVal += delta;
-            this.debounceChange = setTimeout(() => {
-                this.$emit('value-changed', this.keyAutopilotVSSet, this.targetVSVal)
-            }, 100)
+            this.debounceChangeVS = setTimeout(() => {
+                this.$emit('value-changed', this.evAutopilotVSSet, this.targetVS)
+            }, 200)
+        },
+        hdgChanged: function(delta) {
+            if (!this.hdgEnabled) {
+                return
+            }
+            // debounce the event to not send so too many of them
+            clearTimeout(this.debounceChangeHdg)
+            this.targetHdgVal += delta;
+            this.debounceChangeHdg = setTimeout(() => {
+                this.$emit('value-changed', this.evAutopilotHdgSet, this.targetHdg)
+            }, 200)
+        },
+        altPressed: function() {
+            this.$emit('value-changed', this.altEnabled ? this.evAutopilotAltOff : this.evAutopilotAltOn, undefined, true)
+
+            if (!this.altEnabled) {
+                // disable vs
+                if (this.vsEnabled) {
+                    this.vsPressed()                
+                }
+
+                // set to current height
+                this.$emit('value-changed', this.evAutopilotAltSet, this.values[this.keyCurrentAlt], true)
+            }
         },
         vsPressed: function() {
-            if (this.vsEnabled) this.$emit('value-changed', this.keyAutopilotAltSet, 0);
-            this.$emit('value-changed', this.vsEnabled ? this.keyAutopilotVSOff : this.keyAutopilotVSOn);
+            if (this.vsEnabled) this.$emit('value-changed', this.evAutopilotVSSet, 0, true);
+            this.$emit('value-changed', this.vsEnabled ? this.evAutopilotVSOff : this.evAutopilotVSOn, undefined, true);
         },
     },
     template: `
         <div v-bind:style="containerStyle">
             <fs-button
+                    v-bind:active="hdgEnabled"
+                    v-on:click="$emit('value-changed', hdgEnabled ? evAutopilotHdgOff : evAutopilotHdgOn, undefined, true)">
+                HDG
+            </fs-button>
+            <fs-button
                     v-bind:active="apEnabled"
-                    v-on:click="$emit('value-changed', apEnabled ? keyAutopilotOff : keyAutopilotOn)">
+                    v-on:click="$emit('value-changed', apEnabled ? evAutopilotOff : evAutopilotOn, undefined, true)">
                 A/P
             </fs-button>
             <fs-button 
                     v-bind:active="ydEnabled"
-                    v-on:click="$emit('value-changed', keyYawDamperSet, ydEnabled ? 0 : 1)">
+                    v-on:click="$emit('value-changed', evYawDamperSet, ydEnabled ? 0 : 1, true)">
                 YD
             </fs-button>
             <fs-button
                     v-bind:active="altEnabled"
-                    v-on:click="$emit('value-changed', altEnabled ? keyAutopilotAltOff : keyAutopilotAltOn)">
+                    v-on:click="altPressed">
                 ALT
             </fs-button>
             <div />
@@ -126,6 +163,13 @@ Vue.component('auto-pilot', {
                 V/S
             </fs-button>
             <div />
+            <fs-knob 
+                    v-on:change="hdgChanged"
+                    v-bind:active="hdgEnabled"
+                    v-bind:value="values[keyAutopilotHdgVar]"
+                    v-bind:target="targetHdg"
+                    v-bind:step="1">
+            </fs-knob>
             <div />
             <div />
             <fs-knob 

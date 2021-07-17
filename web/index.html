@@ -20,9 +20,9 @@
 <body>
     <div id="app">
         <div class="grid-container">
-            <div class="grid-item col--2x">
+            <div class="grid-item col--2x"
+                    v-if="values.AutopilotAvailable">
                 <auto-pilot 
-                    v-if="values.AutopilotAvailable"
                     v-bind:values="values"
                     v-on:value-changed="onValueChanged"></auto-pilot>
             </div>
