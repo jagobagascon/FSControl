@@ -20,7 +20,7 @@
 <body>
     <div id="app">
         <div class="grid-container">
-            <div class="grid-item">
+            <div class="grid-item col--2x">
                 <auto-pilot 
                     v-if="values.AutopilotAvailable"
                     v-bind:values="values"
@@ -29,6 +29,8 @@
         </div>
     </div>
     
+    <script src="js/components/fs-button.js"></script>
+    <script src="js/components/fs-knob.js"></script>
     <script src="js/components/auto-pilot.js"></script>
     <script src="js/main.js"></script>
 </body>
