@@ -18,10 +18,10 @@ var app = new Vue({
         }
     },
     methods: {
-        onValueChanged: function(index, newValue) {
-            console.info("Value of index " + index + " changed to " + newValue)
+        onValueChanged: function(index, newValue, strict) {
+            console.info("Value of index " + index + " changed to " + newValue + (strict ? "(strict)" : ""))
             // send the value to the server
-            postValueChanged(index, newValue)
+            postValueChanged(index, newValue, strict)
         }
     }
 });
@@ -35,17 +35,25 @@ evtSource.onmessage = function(e) {
 
 
 // value might be empty
-function postValueChanged(name, value) {
+// strict flag represents how important is this value
+//       true -> this is a button press and wont be sent again
+//       false -> this is a value from a knob or other input that sends a lot of values
+function postValueChanged(name, value, strict) {
     var opts = {
         method: 'POST',
         cache: 'no-cache',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: "name=" + name
+        body: "name=" + name + "&strict=" + (strict == true)
     };
     if (value !== undefined) {
-        opts.body += "&value=" + value
+        if (Number.isNaN(value)) {
+            opts.body += "&value=" + value;
+        } else {
+            // send numeric values as integer
+            opts.body += "&value=" + Math.floor( value );
+        }
     }
 
     fetch('/value-change-request', opts).then(function (response) {

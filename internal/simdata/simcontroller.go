@@ -114,27 +114,39 @@ func (c *Controller) serverMainLoop() error {
 			select { // use a timeout in case the reader fails
 			case c.valueChanged <- result:
 			case <-time.After(time.Second * 5):
+				log.Println("ui<- Event lost.")
 			}
 		case request := <-c.valueChangeRequest:
 			// value from the front
-			e := c.NewSimEvent(KeySimEvent(request.Name))
-			if request.HasValue {
-				select {
-				case <-e.RunWithValue(request.Value):
-				case <-time.After(time.Millisecond * 150):
-				}
-			} else {
-				select {
-				case <-e.Run():
-				case <-time.After(time.Millisecond * 150):
-				}
-			}
+			go c.triggerServerEvent(request)
 		case <-c.shutdown:
 			select {
 			case stop <- true:
-			case <-time.After(time.Millisecond * 150):
+			case <-time.After(time.Second * 5):
 			}
 			return c.mate.Close()
+		}
+	}
+}
+
+func (c *Controller) triggerServerEvent(request event.Event) {
+	e := c.NewSimEvent(KeySimEvent(request.Name))
+	timeout := time.Millisecond * 200
+	if request.IsStrict {
+		timeout = time.Second * 5
+	}
+	log.Printf("Event received. Strict ? %v Val: %v", request.IsStrict, request.Value)
+	if request.HasValue {
+		select {
+		case <-e.RunWithValue(request.Value):
+		case <-time.After(timeout):
+			log.Println("fs20<- Event lost.")
+		}
+	} else {
+		select {
+		case <-e.Run():
+		case <-time.After(timeout):
+			log.Println("fs20<- Event lost.")
 		}
 	}
 }

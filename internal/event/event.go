@@ -5,4 +5,5 @@ type Event struct {
 	Name     string
 	Value    int
 	HasValue bool
+	IsStrict bool
 }
