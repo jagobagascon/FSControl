@@ -85,18 +85,12 @@ button .indicator {
 .knob-display > *{
     display: inline-block;
 }
-
 .active .knob-display {
-    color: var(--text-color);
     box-shadow: 0 0 0 1px var(--text-color);
 }
 
-.fade-enter-active, .fade-leave-active {
-    transition: all .2s
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-    opacity: 0;
-    transform: scaleX(0);
+.active .knob-display.current {
+    color: var(--text-color);
 }
 
 /*********************
