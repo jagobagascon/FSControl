@@ -2,7 +2,7 @@
 Vue.component('fs-button', {
     props: [
         "active",
-
+        "isToggle",
     ],
     computed: {
         inputListeners: function () {
@@ -35,7 +35,7 @@ Vue.component('fs-button', {
                 v-bind:style="buttonStyle"
                 v-on="inputListeners">
             <slot></slot>
-            <div class="indicator"></div>
+            <div v-if="isToggle !== false" class="indicator"></div>
         </button>
     `
 })

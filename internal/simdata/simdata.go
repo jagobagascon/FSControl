@@ -22,8 +22,24 @@ type SimData struct {
 	AutopilotHdg    bool    `sim:"AUTOPILOT HEADING LOCK"`
 	AutopilotHdgVar float64 `sim:"AUTOPILOT HEADING LOCK DIR" simUnit:"Degrees"`
 
+	AutopilotNav bool `sim:"AUTOPILOT NAV1 LOCK"`
+
 	LeverPos1 float64 `sim:"GENERAL ENG THROTTLE LEVER POSITION:1"`
 	LeverPos2 float64 `sim:"GENERAL ENG THROTTLE LEVER POSITION:2"`
+
+	// COM
+
+	ComAvailable1        bool  `sim:"COM AVAILABLE:1"`
+	ComActiveFrequency1  int32 `sim:"COM ACTIVE FREQUENCY:1" simUnit:"Hz"`
+	ComStandByFrequency1 int32 `sim:"COM STANDBY FREQUENCY:1" simUnit:"Hz"`
+
+	ComAvailable2        bool  `sim:"COM AVAILABLE:2"`
+	ComActiveFrequency2  int32 `sim:"COM ACTIVE FREQUENCY:2" simUnit:"Hz"`
+	ComStandByFrequency2 int32 `sim:"COM STANDBY FREQUENCY:2" simUnit:"Hz"`
+
+	ComAvailable3        bool  `sim:"COM AVAILABLE:3"`
+	ComActiveFrequency3  int32 `sim:"COM ACTIVE FREQUENCY:3" simUnit:"Hz"`
+	ComStandByFrequency3 int32 `sim:"COM STANDBY FREQUENCY:3" simUnit:"Hz"`
 
 	// Flaps
 	FlapsAvail     bool    `sim:"FLAPS AVAILABLE"`

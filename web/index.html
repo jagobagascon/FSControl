@@ -28,9 +28,20 @@
                     v-bind:values="values"
                     v-on:value-changed="onValueChanged"></auto-pilot>
             </div>
+            <div class="grid-item" v-bind:class="'col--' + commsAmmount + 'x'" v-if="values.FlapsAvail">
+                <radio-control
+                    v-bind:values="values"
+                    v-on:value-changed="onValueChanged"></radio-control>
+            </div>
+            <div class="grid-item"
+                    v-if="values.FlapsAvail">
+                <flap-control 
+                    v-bind:values="values"
+                    v-on:value-changed="onValueChanged"></flap-control>
+            </div>
         </div>
         <div id="full-screen-button">
-            <button v-on:click="onFullScreenPressed">
+            <button v-on:click="onFullScreenPressed" v-if="$el.requestFullscreen">
                 <span class="material-icons">
                     fullscreen
                 </span>
@@ -40,7 +51,9 @@
     
     <script src="js/components/fs-button.js"></script>
     <script src="js/components/fs-knob.js"></script>
-    <script src="js/components/auto-pilot.js"></script>
+    <script src="js/panels/auto-pilot.js"></script>
+    <script src="js/panels/flap-control.js"></script>
+    <script src="js/panels/radio-control.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

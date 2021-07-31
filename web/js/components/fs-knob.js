@@ -3,15 +3,25 @@ Vue.component('fs-knob', {
     props: [
         "active",
         "value",
-        "target",
-        "step"
+        "step",
+        "min",
+        "max",
+        "cycle",
     ],
     data: function() {
         return {
+            targetValue: this.value,
             angle: 0,
             accumulated: 0,
             lastTouchX: 0,
             lastTouchY: 0,
+        }
+    },
+    watch: {
+        "value": function(newVal, oldVal) {
+            if (oldVal == this.targetValue) {
+                this.targetValue = newVal;
+            }
         }
     },
     computed: {
@@ -52,7 +62,7 @@ Vue.component('fs-knob', {
                 "margin-left": "-0.25rem",
                 "top": "5%",
             }
-        }
+        },
     },
     methods: {
         onTouch: function(e) {
@@ -62,36 +72,74 @@ Vue.component('fs-knob', {
         },
         onScroll: function(e) {
             e.preventDefault()
-            let am = 0;
+            let visualAm = 0;
             
             if (e.deltaX !== undefined) {
-                am = -(e.deltaX + e.deltaY);
+                visualAm = -(e.deltaX + e.deltaY);
             } else {
                 let touch = e.touches[0] || e.changedTouches[0];
                 let x = touch.pageX - this.lastTouchX;
                 let y = this.lastTouchY - touch.pageY;
                 this.lastTouchX = touch.pageX;
                 this.lastTouchY = touch.pageY;
-                am = (x + y) * 5;
+                visualAm = (x + y) * 5;
             }
 
             // normalize am with the step
-            am = am * this.step / 100;
+            let normalizedAm = visualAm * this.step / 100;
 
-            this.angle += am
-            this.accumulated += am
+            this.accumulated += normalizedAm
             if (Math.abs(this.accumulated) >= this.step) {
-                let rem = this.accumulated % this.step
-                this.$emit("change", this.accumulated - rem)
-                this.accumulated = rem
+                let rem = this.accumulated % this.step;
+                let delta = this.accumulated - rem;
+                if (this.updateTarget(delta)) {
+                    this.accumulated = rem;
+                    this.emitChange()
+                    // visual update
+                    this.angle += visualAm
+                } else {
+                    this.accumulated -= normalizedAm;
+                }
             }
-        }      
+        },
+        updateTarget: function(delta) {
+            let newTarget = this.targetValue + delta;
+            if (this.cycle == true) {
+                let min = this.min || 0;
+                let max = this.max || 999999;
+                let range = max - min;
+                let valueInRange = newTarget - min;
+                let modulus = ((valueInRange % range) + range) % range;
+                newTarget = min + modulus;
+            } else {
+                if (this.max != null) {
+                    newTarget = Math.min(newTarget, this.max);
+                }
+
+                if (this.min != null) {
+                    newTarget = Math.max(newTarget, this.min);
+                }
+            }
+
+            if (this.targetValue != newTarget) {
+                this.targetValue = newTarget;
+                return true;
+            }
+
+            return false;
+        },
+        emitChange: function() {
+            clearTimeout(this.debounceChange)
+            this.debounceChange = setTimeout(() => {
+                this.$emit("change", this.targetValue)
+            }, 200)
+        },
     },
     template: `
         <div v-bind:style="knobContainerStyle"
                 v-bind:class="{active: active}">
-                <div class="knob-display" v-bind:class="{current: target == value}">
-                    {{ target }}
+                <div class="knob-display" v-bind:class="{current: targetValue == value}">
+                    {{ targetValue }}
                 </div>
 
                 <div class="knob"

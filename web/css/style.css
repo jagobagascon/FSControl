@@ -5,9 +5,11 @@
     --indicator-color: #eee;
     --indicator-color-inactive: #eee1;
     
+    --background-color-light: #222;
     --background-color: #111;
-    --shadow-active: 0px -1px 0px 1px #0009 inset, 0px 0px 3px 0px #FFF9;
-    --shadow-inactive: 0px -5px 0px 1px #0009 inset, 0px 4px 0px 0px #FFF0;
+    --background-color-dark: #070707;
+    --shadow-active: 0px -1px 0px 1px var(--background-color-dark) inset, 0px 0px 3px 0px #FFF9;
+    --shadow-inactive: 0px -5px 0px 1px var(--background-color-dark) inset, 0px 4px 0px 0px #FFF0;
     --blue: #1e90ff;
     --white: #ffffff;
 }
@@ -117,14 +119,14 @@ html, body {
     /* [1] Add some gap between rows and columns */
     grid-gap: .5em;
     /* [2] Make columns adjust according to the available viewport */
-    grid-template-columns: repeat( auto-fill, minmax( 200px, 1fr ) );
+    grid-template-columns: repeat( auto-fill, 225px );
     /* [3] Set the height for implicitly-created row track */
     grid-auto-rows: 225px;
 }
 
 .grid-container > * {
     position: relative;
-    background-color: #222;
+    background-color: var(--background-color-light);
 }
 .row--2x { grid-row-end: span 2; }
 .row--3x { grid-row-end: span 3; }
@@ -134,31 +136,52 @@ html, body {
 .col--3x { grid-column-end: span 3; }
 .col--4x { grid-column-end: span 4; }
 
-/* Grid on large screens */
-@media only screen and (min-width: 1024px) {
-    .grid-container {
-        column-count: 6;
-    }
+
+
+/* COMS */
+.com-panel {
+    height: 100%;
+    float: left;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-template-rows: 3rem 6.5rem auto
 }
 
-/* Grid on medium-sized screens */
-@media only screen and (max-width: 1023px) and (min-width: 768px) {
-    .grid-container {
-        column-count: 4;
-    }
+.com-name {
+    text-align: center;
+    background: var(--background-color-dark);
+    border-radius: 1em;
+    text-shadow: 0px 0px 3px var(--text-color);
+    font-size: 1.2rem;
+    padding: 0.5rem 0;
+    margin-bottom: .5rem;
+    box-shadow: 0px 0px 0px 3px var(--background-color) inset;
 }
 
-/* Grid on small screens */
-@media only screen and (max-width: 767px) and (min-width: 540px) {
-    .grid-container {
-        column-count: 3;
-    }
+.com-value-container {
+    text-align: center;
+    color: var(--text-color-inactive);
+    background: linear-gradient(0deg, transparent 50%, #0d47a1 50%);
+    border-radius: 1em;
+    font-size: 1.4rem;
+    padding: 0.5rem 0;
+    margin-bottom: 1rem;
+    box-shadow: 0px 0px 0px 3px var(--background-color) inset;
+    overflow: hidden;
 }
 
+.com-value {
+    padding: .25rem;
+}
 
-/* Grid on small screens */
-@media only screen and (max-width: 539px) and (min-width: 300px) {
-    .grid-container {
-        column-count: 2;
-    }
+.com-active {
+    text-shadow: 0px 0px 3px var(--text-color);
+    color: var(--text-color);
+}
+
+.com-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
 }

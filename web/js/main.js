@@ -3,30 +3,47 @@ var app = new Vue({
     el: '#app',
     data: {
         "values": {/*
-            "AutopilotAlt": false,
-            "AutopilotAltVar": 4700,
-            "AutopilotAvailable": true,
-            "AutopilotMaster": false,
-            "Alt": 800.12,
-            "FlapsAvail": true,
-            "FlapsCurrent": 1,
-            "FlapsPercent": 0.5,
-            "FlapsPositions": 2,
-            "LeverPos1": 0,
-            "LeverPos2": 0,
-            "YawDamper": false,*/
+            AutopilotAvailable: true,
+            AutopilotMaster: false,
+            YawDamper: false,
+            AutopilotAlt: false,
+            AutopilotAltVar: 0,
+            CurrentAlt: 0,
+            AutopilotVS: false,
+            AutopilotVSVar: 0,
+            AutopilotHdg: false,
+            AutopilotHdgVar: 0,
+            LeverPos1: 0,
+            LeverPos2: 0,
+            FlapsAvail: true,
+            FlapsCurrent: 0,
+            FlapsPositions: 4,
+            FlapsPercent: 0,*/
         }
     },
     methods: {
-        onValueChanged: function(index, newValue, strict) {
+        onValueChanged: function(index, newValue, strict, typeHint) {
             console.info("Value of index " + index + " changed to " + newValue + (strict ? "(strict)" : ""))
             // send the value to the server
-            postValueChanged(index, newValue, strict)
+            postValueChanged(index, newValue, strict, typeHint)
         },
         onFullScreenPressed: function() {
             if (this.$el.requestFullscreen) {
                 this.$el.requestFullscreen();
             }
+        }
+    },
+    computed: {
+        commsAmmount: function() {
+            let am = 0;
+            let comms = 4;
+
+            for (let i = 0; i < comms; i++) {
+                if (this.values["ComAvailable" + (i + 1)] === true) {
+                    am++;
+                }
+            }
+            return am;
         }
     }
 });
@@ -52,8 +69,9 @@ function postValueChanged(name, value, strict) {
         },
         body: "name=" + name + "&strict=" + (strict == true)
     };
+
     if (value !== undefined) {
-        if (Number.isNaN(value)) {
+        if (typeof(value) !== "number") {
             opts.body += "&value=" + value;
         } else {
             // send numeric values as integer
