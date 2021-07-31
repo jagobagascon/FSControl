@@ -95,7 +95,7 @@ func (c *Controller) serverMainLoop() error {
 		c.vars = append(c.vars, &Var{defineID, request.Name})
 	}
 
-	requestDataInterval := time.Millisecond * 250
+	requestDataInterval := time.Millisecond * 100
 	receiveDataInterval := time.Millisecond * 30
 
 	stop := make(chan interface{}, 1)
