@@ -44,6 +44,7 @@ html, body {
 }
 
 .panel-button, .knob {
+    cursor: pointer;
     color:  var(--text-color-inactive, #eee);
     background-color: var(--background-color);
     border-radius: 1rem;
@@ -149,6 +150,7 @@ html, body {
 }
 
 .com-name {
+    cursor: pointer;
     text-align: center;
     background: var(--background-color-dark);
     border-radius: 1em;
@@ -159,15 +161,17 @@ html, body {
     color: var(--text-color-inactive);
 }
 
-.com-name.current {
+.current .com-name {
+    cursor: default;
     text-shadow: 0px 0px 3px var(--text-color);
     color: var(--text-color);
 }
 
 .com-value-container {
+    cursor: ns-resize;
     text-align: center;
     color: var(--text-color-inactive);
-    background: linear-gradient(0deg, transparent 50%, #0d47a1 50%);
+    background: linear-gradient(0deg, transparent 50%, #0d47a155 50%);
     border-radius: 1em;
     font-size: 1.4rem;
     padding: 0.5rem 0;
@@ -176,11 +180,15 @@ html, body {
     overflow: hidden;
 }
 
+.current .com-value-container {
+    background: linear-gradient(0deg, transparent 50%, #0d47a1 50%);
+}
+
 .com-value {
     padding: .25rem;
 }
 
-.com-active {
+.current .com-active {
     text-shadow: 0px 0px 3px var(--text-color);
     color: var(--text-color);
 }

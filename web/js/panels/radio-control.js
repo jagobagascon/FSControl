@@ -116,11 +116,11 @@ Vue.component('radio-control', {
             <template v-for="n in 2">
                 <div v-if="comAvailable[n]"
                     class="com-panel"
+                    v-bind:class="{ current: comCurrent[n] }"
                     v-bind:style="comPanelStyle">
                     
                     <div class="com-name" 
-                        v-bind:class="{ current: comCurrent[n] }"
-                        v-on:click="$emit('value-changed', evComSelect[n], n, true)">
+                        v-on:click="comCurrent[n] ? null : $emit('value-changed', evComSelect[n], n, true)">
                         COM {{n}}
                     </div>
 
