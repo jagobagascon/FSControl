@@ -31,6 +31,7 @@
             <div class="grid-item" v-bind:class="'col--' + commsAmmount + 'x'" v-if="values.FlapsAvail">
                 <radio-control
                     v-bind:values="values"
+                    v-bind:maxcoms="2"
                     v-on:value-changed="onValueChanged"></radio-control>
             </div>
             <div class="grid-item"

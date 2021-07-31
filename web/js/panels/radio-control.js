@@ -1,7 +1,8 @@
 // flap-control component
 Vue.component('radio-control', {
     props: [
-        "values"
+        "values",
+        "maxcoms",
     ],
     data: function() {
         return {
@@ -10,11 +11,13 @@ Vue.component('radio-control', {
                 "",
                 "COM_STBY_RADIO_SET_HZ",
                 "COM2_STBY_RADIO_SET_HZ",
+                "COM3_STBY_RADIO_SET_HZ",
             ],
             evComSelect: [
                 "",
                 "COM1_TRANSMIT_SELECT",
                 "COM2_TRANSMIT_SELECT",
+                "COM3_TRANSMIT_SELECT",
             ]
         }
     },
@@ -36,6 +39,7 @@ Vue.component('radio-control', {
                 false,
                 this.values["ComCurrent1"],
                 this.values["ComCurrent2"],
+                this.values["ComCurrent3"],
             ]
         },
         comAvailable: function() {
@@ -43,6 +47,7 @@ Vue.component('radio-control', {
                 false,
                 this.values["ComAvailable1"],
                 this.values["ComAvailable2"],
+                this.values["ComAvailable3"],
             ];
         },
         comActive: function() {
@@ -53,6 +58,10 @@ Vue.component('radio-control', {
             let com2 = this.values["ComActiveFrequency2"];
             let com2MHz = Math.floor(com2 / 1_000_000) * 1_000_000
             let com2Hz = Math.floor( (com2 % com2MHz) / 1_000)
+
+            let com3 = this.values["ComActiveFrequency3"];
+            let com3MHz = Math.floor(com3 / 1_000_000) * 1_000_000
+            let com3Hz = Math.floor( (com3 % com3MHz) / 1_000)
             return [
                 false,
                 {
@@ -62,6 +71,10 @@ Vue.component('radio-control', {
                 {
                     mhz: com2MHz / 1_000_000,
                     hz: com2Hz,
+                },
+                {
+                    mhz: com3MHz / 1_000_000,
+                    hz: com3Hz,
                 },
             ];
         },
@@ -73,6 +86,10 @@ Vue.component('radio-control', {
             let com2 = this.values["ComStandByFrequency2"];
             let com2MHz = Math.floor(com2 / 1_000_000) * 1_000_000
             let com2Hz = Math.floor( (com2 % com2MHz) / 1_000)
+
+            let com3 = this.values["ComStandByFrequency3"];
+            let com3MHz = Math.floor(com3 / 1_000_000) * 1_000_000
+            let com3Hz = Math.floor( (com3 % com3MHz) / 1_000)
             return [
                 false,
                 {
@@ -83,12 +100,16 @@ Vue.component('radio-control', {
                     mhz: com2MHz / 1_000_000,
                     hz: com2Hz,
                 },
+                {
+                    mhz: com3MHz / 1_000_000,
+                    hz: com3Hz,
+                },
             ];
         },
 
         commsAmmount: function() {
             let am = 0;
-            let comms = 2;
+            let comms = this.maxcoms;
 
             for (let i = 0; i < comms; i++) {
                 if (this.comAvailable[i + 1] === true) {
@@ -113,7 +134,7 @@ Vue.component('radio-control', {
     },
     template: `
         <div v-bind:style="containerStyle">
-            <template v-for="n in 2">
+            <template v-for="n in commsAmmount">
                 <div v-if="comAvailable[n]"
                     class="com-panel"
                     v-bind:class="{ current: comCurrent[n] }"
