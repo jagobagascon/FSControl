@@ -32,14 +32,17 @@ type SimData struct {
 	ComAvailable1        bool  `sim:"COM AVAILABLE:1"`
 	ComActiveFrequency1  int32 `sim:"COM ACTIVE FREQUENCY:1" simUnit:"Hz"`
 	ComStandByFrequency1 int32 `sim:"COM STANDBY FREQUENCY:1" simUnit:"Hz"`
+	ComCurrent1          bool  `sim:"COM TRANSMIT:1"`
 
 	ComAvailable2        bool  `sim:"COM AVAILABLE:2"`
 	ComActiveFrequency2  int32 `sim:"COM ACTIVE FREQUENCY:2" simUnit:"Hz"`
 	ComStandByFrequency2 int32 `sim:"COM STANDBY FREQUENCY:2" simUnit:"Hz"`
+	ComCurrent2          bool  `sim:"COM TRANSMIT:2"`
 
 	ComAvailable3        bool  `sim:"COM AVAILABLE:3"`
 	ComActiveFrequency3  int32 `sim:"COM ACTIVE FREQUENCY:3" simUnit:"Hz"`
 	ComStandByFrequency3 int32 `sim:"COM STANDBY FREQUENCY:3" simUnit:"Hz"`
+	ComCurrent3          bool  `sim:"COM TRANSMIT:3"`
 
 	// Flaps
 	FlapsAvail     bool    `sim:"FLAPS AVAILABLE"`

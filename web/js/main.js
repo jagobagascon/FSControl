@@ -36,7 +36,7 @@ var app = new Vue({
     computed: {
         commsAmmount: function() {
             let am = 0;
-            let comms = 4;
+            let comms = 2;
 
             for (let i = 0; i < comms; i++) {
                 if (this.values["ComAvailable" + (i + 1)] === true) {

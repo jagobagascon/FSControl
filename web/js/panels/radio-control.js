@@ -6,17 +6,15 @@ Vue.component('radio-control', {
     data: function() {
         return {
             //writes
-            evComSwap: [
-                "",
-                "COM1_RADIO_SWAP",
-                "COM2_RADIO_SWAP",
-                "COM3_RADIO_SWAP",
-            ],
             evComSet: [
                 "",
                 "COM_STBY_RADIO_SET_HZ",
-                "COM2_STBY_RADIO_SET",
-                "COM3_STBY_RADIO_SET",
+                "COM2_STBY_RADIO_SET_HZ",
+            ],
+            evComSelect: [
+                "",
+                "COM1_TRANSMIT_SELECT",
+                "COM2_TRANSMIT_SELECT",
             ]
         }
     },
@@ -33,46 +31,64 @@ Vue.component('radio-control', {
     },
     computed: {
         // reads
+        comCurrent: function() {
+            return [
+                false,
+                this.values["ComCurrent1"],
+                this.values["ComCurrent2"],
+            ]
+        },
         comAvailable: function() {
             return [
                 false,
                 this.values["ComAvailable1"],
                 this.values["ComAvailable2"],
-                this.values["ComAvailable3"],
             ];
         },
         comActive: function() {
             let com1 = this.values["ComActiveFrequency1"];
             let com1MHz = Math.floor(com1 / 1_000_000) * 1_000_000
             let com1Hz = Math.floor( (com1 % com1MHz) / 1_000)
+
+            let com2 = this.values["ComActiveFrequency2"];
+            let com2MHz = Math.floor(com2 / 1_000_000) * 1_000_000
+            let com2Hz = Math.floor( (com2 % com2MHz) / 1_000)
             return [
                 false,
                 {
                     mhz: com1MHz / 1_000_000,
                     hz: com1Hz,
                 },
-                this.values["ComActiveFrequency2"],
-                this.values["ComActiveFrequency3"],
+                {
+                    mhz: com2MHz / 1_000_000,
+                    hz: com2Hz,
+                },
             ];
         },
         comStandBy: function() {
             let com1 = this.values["ComStandByFrequency1"];
             let com1MHz = Math.floor(com1 / 1_000_000) * 1_000_000
             let com1Hz = Math.floor( (com1 % com1MHz) / 1_000)
+
+            let com2 = this.values["ComStandByFrequency2"];
+            let com2MHz = Math.floor(com2 / 1_000_000) * 1_000_000
+            let com2Hz = Math.floor( (com2 % com2MHz) / 1_000)
             return [
                 false,
                 {
                     mhz: com1MHz / 1_000_000,
                     hz: com1Hz,
                 },
-                this.values["ComStandByFrequency2"],
-                this.values["ComStandByFrequency3"],
+                {
+                    mhz: com2MHz / 1_000_000,
+                    hz: com2Hz,
+                },
             ];
         },
 
         commsAmmount: function() {
             let am = 0;
-            let comms = 4;
+            let comms = 2;
 
             for (let i = 0; i < comms; i++) {
                 if (this.comAvailable[i + 1] === true) {
@@ -97,12 +113,14 @@ Vue.component('radio-control', {
     },
     template: `
         <div v-bind:style="containerStyle">
-            <template v-for="n in 4">
+            <template v-for="n in 2">
                 <div v-if="comAvailable[n]"
                     class="com-panel"
                     v-bind:style="comPanelStyle">
                     
-                    <div class="com-name">
+                    <div class="com-name" 
+                        v-bind:class="{ current: comCurrent[n] }"
+                        v-on:click="$emit('value-changed', evComSelect[n], n, true)">
                         COM {{n}}
                     </div>
 
@@ -118,7 +136,7 @@ Vue.component('radio-control', {
 
                     <div class="com-controls">
                         <fs-knob 
-                            v-on:change="(newVal) => comChanged(n, newVal, comStandBy[n].hz)"
+                            v-on:change="(newVal, oldVal) => $emit('value-changed', evComSet[n], newVal * 1000000 + comStandBy[n].hz * 1000, true)"
                             v-bind:active="true"
                             v-bind:value="comStandBy[n].mhz"
                             v-bind:min="118"
@@ -127,7 +145,7 @@ Vue.component('radio-control', {
                             v-bind:step="1">
                         </fs-knob>
                         <fs-knob 
-                            v-on:change="(newVal) => comChanged(n, comStandBy[n].mhz, newVal)"
+                            v-on:change="(newVal, oldVal) => $emit('value-changed', evComSet[n], comStandBy[n].mhz * 1000000 + newVal * 1000, true)"
                             v-bind:active="true"
                             v-bind:value="comStandBy[n].hz"
                             v-bind:min="0"
@@ -138,7 +156,10 @@ Vue.component('radio-control', {
                         <fs-button
                             v-bind:isToggle="false"
                             v-bind:active="false"
-                                v-on:click="$emit('value-changed', evComSwap[n], undefined, true)">
+                                v-on:click="
+                                $emit('value-changed', 'COM_RADIO', undefined, true);
+                                $emit('value-changed', 'SELECT_' + n, undefined, true);
+                                $emit('value-changed', 'FREQUENCY_SWAP', undefined, true)">
                             <span class="material-icons">
                                 import_export
                             </span>
