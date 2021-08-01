@@ -24,6 +24,8 @@ type SimData struct {
 
 	AutopilotNav bool `sim:"AUTOPILOT NAV1 LOCK"`
 
+	AutopilotApr bool `sim:"AUTOPILOT APPROACH HOLD"`
+
 	LeverPos1 float64 `sim:"GENERAL ENG THROTTLE LEVER POSITION:1"`
 	LeverPos2 float64 `sim:"GENERAL ENG THROTTLE LEVER POSITION:2"`
 

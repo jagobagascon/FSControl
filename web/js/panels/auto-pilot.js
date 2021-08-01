@@ -25,6 +25,9 @@ Vue.component('auto-pilot', {
 
             evAutopilotNavOn: "AP_NAV1_HOLD_ON",
             evAutopilotNavOff: "AP_NAV1_HOLD_OFF",
+
+            evAutopilotAprOn: "AP_APR_HOLD_ON",
+            evAutopilotAprOff: "AP_APR_HOLD_OFF",
         }
     },
     computed: {
@@ -44,6 +47,8 @@ Vue.component('auto-pilot', {
         autopilotHdgVar: function() { return this.values["AutopilotHdgVar"]; },
         
         autopilotNavEnabled: function() { return this.values["AutopilotNav"] == true },
+
+        autopilotAprEnabled: function() { return this.values["AutopilotApr"] == true },
 
         containerStyle: function() {
             return {
@@ -128,7 +133,11 @@ Vue.component('auto-pilot', {
                     v-bind:step="1">
             </fs-knob>
             <div />
-            <div />
+            <fs-button
+                v-bind:active="autopilotAprEnabled"
+                v-on:click="$emit('value-changed', autopilotAprEnabled ? evAutopilotAprOff : evAutopilotAprOn, undefined, true)">
+                APR
+            </fs-button>
             <div />
             <fs-knob 
                     v-on:change="altChanged"
