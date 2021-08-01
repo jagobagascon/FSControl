@@ -28,7 +28,9 @@
                     v-bind:values="values"
                     v-on:value-changed="onValueChanged"></auto-pilot>
             </div>
-            <div class="grid-item" v-bind:class="'col--' + commsAmmount + 'x'" v-if="values.FlapsAvail">
+            <div class="grid-item" 
+                v-bind:class="'col--' + commsAmmount + 'x'"
+                v-if="commsAmmount > 0">
                 <radio-control
                     v-bind:values="values"
                     v-bind:maxcoms="2"
