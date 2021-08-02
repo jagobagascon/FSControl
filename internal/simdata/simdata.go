@@ -26,6 +26,8 @@ type SimData struct {
 
 	AutopilotApr bool `sim:"AUTOPILOT APPROACH HOLD"`
 
+	// Lever
+
 	LeverPos1 float64 `sim:"GENERAL ENG THROTTLE LEVER POSITION:1"`
 	LeverPos2 float64 `sim:"GENERAL ENG THROTTLE LEVER POSITION:2"`
 
@@ -51,6 +53,11 @@ type SimData struct {
 	FlapsCurrent   int32   `sim:"FLAPS HANDLE INDEX"`
 	FlapsPositions int32   `sim:"FLAPS NUM HANDLE POSITIONS"`
 	FlapsPercent   float64 `sim:"FLAPS HANDLE PERCENT"`
+
+	// Trim
+	ElevatorTrimNeutral  float64 `sim:"ELEVATOR TRIM NEUTRAL"`
+	ElevatorTrimPct      float64 `sim:"ELEVATOR TRIM PCT"`
+	ElevatorTrimPosition float64 `sim:"ELEVATOR TRIM POSITION"`
 }
 
 func (sd *SimData) Put(name string, value interface{}) {

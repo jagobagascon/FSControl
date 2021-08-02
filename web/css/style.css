@@ -198,3 +198,129 @@ html, body {
     grid-template-columns: 1fr 1fr 1fr;
     gap: 1.5rem;
 }
+
+/* TRIM CONTROL */
+.trim-container {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    position: relative;
+}
+
+.trim-wheel-canal {
+    height: 100%;
+    width: 3rem;
+    background: linear-gradient(
+        0deg, 
+        var(--background-color-dark) 48%, 
+        rgb(79, 168, 27) 48%, 
+        rgb(79, 168, 27) 52%, 
+        var(--background-color-dark) 52%);
+    border-radius: .5rem;
+    padding: 5px 5px;
+    overflow: hidden;
+}
+
+
+.trim-wheel-degrees {
+    position: absolute;
+    width: auto;
+    bottom: 2px;
+    white-space: nowrap;
+    font-size: 0.7rem;
+    display: inline-block;
+    text-align: center;
+    background: #111;
+    border-radius: 1rem;
+    line-height: 0.4rem;
+    padding: 0.4rem 0.5rem;
+    box-shadow: 0 0 0 1px var(--text-color-inactive);
+    color: var(--text-color-inactive);
+}
+
+
+.trim-wheel-container {
+    height: 100%;
+    padding: 5px 0;
+    border-radius: .5rem;
+    overflow: hidden;
+}
+
+.trim-wheel {
+    position: relative;
+    transform-style: preserve-3d;
+    height: 100%;
+}
+
+.trim-wheel-cell {
+    position: absolute;
+
+    /*
+        225px - containerPadding(10 * 2) - wheelPadding(10 * 2)
+        == 185px => radius of 92.5px
+     */
+    --wheel-radius: 92px;
+    /* 
+        based on https://3dtransforms.desandro.com/carousel
+        angle = 10 items => 360 / 10
+        radius = (height/2) / tan(angle/2)
+        height = radius * tan(angle/2) * 2
+        92 * tan(36/2 deg) * 2 = 60
+    */
+    height: 16px;
+    
+    width: 100%;
+
+    /* vertical center */
+    top: 50%;
+    margin-top: -8px;
+
+}
+
+.trim-wheel-cell:nth-child(odd) {
+    background-color:var(--background-color-light);
+}
+.trim-wheel-cell:nth-child(even) {
+    background-color:var(--background-color);
+}
+
+.trim-wheel-cell:nth-child(1) {
+    background-color: rgb(79, 168, 27);
+}
+
+.trim-wheel-cell:nth-child( 1) { transform: rotateX(  0deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child( 2) { transform: rotateX( 10deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child( 3) { transform: rotateX( 20deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child( 4) { transform: rotateX( 30deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child( 5) { transform: rotateX( 40deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child( 6) { transform: rotateX( 50deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child( 7) { transform: rotateX( 60deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child( 8) { transform: rotateX( 70deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child( 9) { transform: rotateX( 80deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(10) { transform: rotateX( 90deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(11) { transform: rotateX(100deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(12) { transform: rotateX(110deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(13) { transform: rotateX(120deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(14) { transform: rotateX(130deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(15) { transform: rotateX(140deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(16) { transform: rotateX(150deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(17) { transform: rotateX(160deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(18) { transform: rotateX(170deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(19) { transform: rotateX(180deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(20) { transform: rotateX(190deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(21) { transform: rotateX(200deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(22) { transform: rotateX(210deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(23) { transform: rotateX(220deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(24) { transform: rotateX(230deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(25) { transform: rotateX(240deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(26) { transform: rotateX(250deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(27) { transform: rotateX(260deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(28) { transform: rotateX(270deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(29) { transform: rotateX(280deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(30) { transform: rotateX(290deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(31) { transform: rotateX(300deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(32) { transform: rotateX(310deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(33) { transform: rotateX(320deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(34) { transform: rotateX(330deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(35) { transform: rotateX(340deg) translateZ(var(--wheel-radius)); }
+.trim-wheel-cell:nth-child(36) { transform: rotateX(350deg) translateZ(var(--wheel-radius)); }
