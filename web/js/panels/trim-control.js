@@ -8,12 +8,12 @@ Vue.component('trim-control', {
             //writes
             targetTrimPct: 0,
             evTrimSet: "AXIS_ELEV_TRIM_SET",
+            maxDegrees: 75,
         }
     },
     watch: {
         'values.ElevatorTrimPct': function(newVal, oldVal) {
-            console.info(oldVal.toFixed(2), this.targetTrimPct.toFixed(2))
-            if (oldVal.toFixed(2) == this.targetTrimPct.toFixed(2)) {
+            if (oldVal == null || oldVal.toFixed(2) == this.targetTrimPct.toFixed(2)) {
                 this.targetTrimPct = newVal;
             }
         }
@@ -32,7 +32,7 @@ Vue.component('trim-control', {
 
         wheelStyle: function() {
             return {
-                transform: "rotateX(" + (-90 * this.targetTrimPct) + "deg)",
+                transform: "rotateX(" + (-this.maxDegrees * this.targetTrimPct) + "deg)",
             };
         },
     },
