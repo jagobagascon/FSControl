@@ -213,8 +213,8 @@ html, body {
     background: linear-gradient(
         0deg, 
         var(--background-color-dark) 48%, 
-        rgb(79, 168, 27) 48%, 
-        rgb(79, 168, 27) 52%, 
+        rgb(102, 102, 102) 48%, 
+        rgb(102, 102, 102) 52%, 
         var(--background-color-dark) 52%);
     border-radius: .5rem;
     padding: 5px 5px;
@@ -234,8 +234,9 @@ html, body {
     border-radius: 1rem;
     line-height: 0.4rem;
     padding: 0.4rem 0.5rem;
-    box-shadow: 0 0 0 1px var(--text-color-inactive);
-    color: var(--text-color-inactive);
+
+    box-shadow: 0 0 0 1px var(--text-color);
+    color: var(--text-color);
 }
 
 
@@ -284,8 +285,15 @@ html, body {
     background-color:var(--background-color);
 }
 
-.trim-wheel-cell:nth-child(1) {
-    background-color: rgb(79, 168, 27);
+.trim-wheel-cell:nth-child(1)::after {
+    background-color: white;
+    box-shadow: 0 0 3px 0 white;
+    width: 100%;
+    height: 2px;
+    content: " ";
+    position: absolute;
+    top: 50%;
+    margin-top: -2px;
 }
 
 .trim-wheel-cell:nth-child( 1) { transform: rotateX(  0deg) translateZ(var(--wheel-radius)); }
