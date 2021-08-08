@@ -15,11 +15,14 @@ var app = new Vue({
             AutopilotHdgVar: 0,
             LeverPos1: 0,
             LeverPos2: 0,
-            FlapsAvail: true,
+            FlapsAvail: false,
             FlapsCurrent: 0,
             FlapsPositions: 4,
-            FlapsPercent: 0,*/
-        }
+            FlapsPercent: 0,
+            ElevatorTrimPct: 0.1,
+            ElevatorTrimNeutral: 0.03,
+            ElevatorTrimPosition: 0.12,
+        */}
     },
     methods: {
         onValueChanged: function(index, newValue, strict, typeHint) {
