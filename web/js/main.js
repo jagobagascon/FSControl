@@ -22,7 +22,19 @@ var app = new Vue({
             ElevatorTrimPct: 0.1,
             ElevatorTrimNeutral: 0.03,
             ElevatorTrimPosition: 0.12,
-        */}
+            ComAvailable1: true,
+            ComActiveFrequency1: 118175000,
+            ComStandByFrequency1: 122175000,
+            ComCurrent1: true,
+            ComAvailable2: true,
+            ComActiveFrequency2: 122175000,
+            ComStandByFrequency2: 118175000,
+            ComCurrent2: false,
+            ComAvailable3: false,
+            ComActiveFrequency3: 122175000,
+            ComStandByFrequency3: 118175000,
+            ComCurrent3: false,*/
+        }
     },
     methods: {
         onValueChanged: function(index, newValue, strict, typeHint) {
