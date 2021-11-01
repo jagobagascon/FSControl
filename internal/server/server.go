@@ -19,12 +19,20 @@ type Server struct {
 	simValueRequest chan event.Event
 }
 
-func NewServer() *Server {
+type Config struct {
+	Dev bool
+}
+
+func NewServer(cfg *Config) *Server {
 	// Starts simcontroller service
 	simValueChanged := make(chan simdata.SimData)
 	simValueRequest := make(chan event.Event)
 	return &Server{
-		uiServer:        ui.NewServer(simValueChanged, simValueRequest),
+		uiServer: ui.NewServer(&ui.Config{
+			Dev:                 cfg.Dev,
+			ValueChanged:        simValueChanged,
+			ValueChangeRequests: simValueRequest,
+		}),
 		simcontroller:   simdata.NewSimController(simValueChanged, simValueRequest),
 		simValueChanged: simValueChanged,
 		simValueRequest: simValueRequest,

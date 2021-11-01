@@ -42,7 +42,8 @@
                     v-bind:values="values"
                     v-on:value-changed="onValueChanged"></flap-control>
             </div>
-            <div class="grid-item">
+            <div class="grid-item"
+                    v-if="values.ElevatorTrimDisabled !== false">
                 <trim-control 
                     v-bind:values="values"
                     v-on:value-changed="onValueChanged"></trim-control>

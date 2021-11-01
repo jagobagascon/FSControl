@@ -2,8 +2,10 @@ package ui
 
 import (
 	"context"
+	"embed"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
 	"strconv"
@@ -14,9 +16,17 @@ import (
 	"github.com/jagobagascon/FSControl/internal/simdata"
 )
 
+//go:embed static/*
+var staticFiles embed.FS
+
 type Server struct {
+	dev bool
+
 	httpServer *http.Server
-	shutdown   chan bool
+
+	staticFileServer http.Handler
+
+	shutdown chan bool
 
 	// change requests from ui to server
 	valueChangeRequests chan<- event.Event
@@ -36,16 +46,32 @@ type Server struct {
 	clients map[chan simdata.SimData]bool
 }
 
-func NewServer(valueChanged <-chan simdata.SimData, valueChangeRequests chan<- event.Event) *Server {
+type Config struct {
+	Dev bool
+
+	// receives events from the SIM
+	ValueChanged <-chan simdata.SimData
+
+	// receives commands from the UI
+	ValueChangeRequests chan<- event.Event
+}
+
+func NewServer(cfg *Config) *Server {
 	// Starts simdata service
+	sf, _ := fs.Sub(staticFiles, "static")
+	fs := http.FileServer(http.FS(sf))
+
 	return &Server{
+		dev: cfg.Dev,
 		httpServer: &http.Server{
 			Addr: ":8080",
 		},
+		staticFileServer: fs,
+
 		shutdown: make(chan bool),
 
-		valueChangeRequests: valueChangeRequests,
-		valueChanged:        valueChanged,
+		valueChangeRequests: cfg.ValueChangeRequests,
+		valueChanged:        cfg.ValueChanged,
 		newClients:          make(chan chan simdata.SimData),
 		closingClients:      make(chan chan simdata.SimData),
 		clients:             make(map[chan simdata.SimData]bool),
@@ -63,9 +89,15 @@ func (s *Server) listenAndServe(wg *sync.WaitGroup) {
 	defer wg.Done() // let main know we are done cleaning up
 
 	// Starts web UI server
-	http.HandleFunc("/", s.index)
 	http.HandleFunc("/value-change-request", s.valueChangeRequest)
 	http.HandleFunc("/subscribe", s.serverEvents)
+	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
+		if !s.dev {
+			s.staticFileServer.ServeHTTP(rw, r)
+		} else {
+			s.index(rw, r)
+		}
+	})
 
 	if err := s.httpServer.ListenAndServe(); err != http.ErrServerClosed {
 		// unexpected error. port in use?
@@ -82,8 +114,7 @@ func (s *Server) Stop() {
 }
 
 func (s *Server) index(w http.ResponseWriter, req *http.Request) {
-	log.Println("Received request for " + req.URL.Path)
-	http.ServeFile(w, req, "web"+req.URL.Path)
+	http.ServeFile(w, req, "internal/ui/static"+req.URL.Path)
 }
 
 func (s *Server) valueChangeRequest(w http.ResponseWriter, req *http.Request) {

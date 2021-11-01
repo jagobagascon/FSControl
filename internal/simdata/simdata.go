@@ -55,6 +55,7 @@ type SimData struct {
 	FlapsPercent   float64 `sim:"FLAPS HANDLE PERCENT"`
 
 	// Trim
+	ElevatorTrimDisabled bool    `sim:"ELEVATOR TRIM DISABLED"`
 	ElevatorTrimNeutral  float64 `sim:"ELEVATOR TRIM NEUTRAL"`
 	ElevatorTrimPct      float64 `sim:"ELEVATOR TRIM PCT"`
 	ElevatorTrimPosition float64 `sim:"ELEVATOR TRIM POSITION"`

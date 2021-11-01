@@ -81,6 +81,7 @@ func (c *Controller) Stop() {
 }
 
 func (c *Controller) serverMainLoop() error {
+	// open connection with the game
 	if err := c.mate.Open("FSControl"); err != nil {
 		return err
 	}
@@ -108,14 +109,12 @@ func (c *Controller) serverMainLoop() error {
 		OnException: c.OnException,
 	})
 
+	// loop until notified about shutdown
 	for {
 		select {
 		case result := <-c.simdataReady:
-			select { // use a timeout in case the reader fails
-			case c.valueChanged <- result:
-			case <-time.After(time.Second * 5):
-				log.Println("ui<- Event lost.")
-			}
+			// received a value from the SIM. Notify the front
+			go c.notifyDataChanged(result)
 		case request := <-c.valueChangeRequest:
 			// value from the front
 			go c.triggerServerEvent(request)
@@ -126,6 +125,15 @@ func (c *Controller) serverMainLoop() error {
 			}
 			return c.mate.Close()
 		}
+	}
+}
+
+// notifyFront sends the data into the frontend channel
+func (c *Controller) notifyDataChanged(d SimData) {
+	select { // use a timeout in case the reader fails
+	case c.valueChanged <- d:
+	case <-time.After(time.Second * 1):
+		log.Println("ui<- Event lost.")
 	}
 }
 
