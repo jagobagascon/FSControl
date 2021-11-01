@@ -20,16 +20,22 @@ type Server struct {
 }
 
 type Config struct {
-	Dev bool
+	Dev     bool
+	Address string
 }
 
 func NewServer(cfg *Config) *Server {
 	// Starts simcontroller service
 	simValueChanged := make(chan simdata.SimData)
 	simValueRequest := make(chan event.Event)
+	log.Println("Starting server.")
+	if cfg.Dev {
+		log.Println("DEVELOPMENT MODE.")
+	}
 	return &Server{
 		uiServer: ui.NewServer(&ui.Config{
 			Dev:                 cfg.Dev,
+			Address:             cfg.Address,
 			ValueChanged:        simValueChanged,
 			ValueChangeRequests: simValueRequest,
 		}),
@@ -39,6 +45,13 @@ func NewServer(cfg *Config) *Server {
 		}),
 		simValueChanged: simValueChanged,
 		simValueRequest: simValueRequest,
+	}
+}
+
+func NewConfig() *Config {
+	return &Config{
+		Dev:     false,
+		Address: ":8080",
 	}
 }
 

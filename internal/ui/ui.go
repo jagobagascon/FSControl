@@ -49,6 +49,8 @@ type Server struct {
 type Config struct {
 	Dev bool
 
+	Address string
+
 	// receives events from the SIM
 	ValueChanged <-chan simdata.SimData
 
@@ -64,7 +66,7 @@ func NewServer(cfg *Config) *Server {
 	return &Server{
 		dev: cfg.Dev,
 		httpServer: &http.Server{
-			Addr: ":8080",
+			Addr: cfg.Address,
 		},
 		staticFileServer: fs,
 
