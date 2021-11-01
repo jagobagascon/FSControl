@@ -33,7 +33,10 @@ func NewServer(cfg *Config) *Server {
 			ValueChanged:        simValueChanged,
 			ValueChangeRequests: simValueRequest,
 		}),
-		simcontroller:   simdata.NewSimController(simValueChanged, simValueRequest),
+		simcontroller: simdata.NewSimController(&simdata.Config{
+			ValueChanged:       simValueChanged,
+			ValueChangeRequest: simValueRequest,
+		}),
 		simValueChanged: simValueChanged,
 		simValueRequest: simValueRequest,
 	}

@@ -35,11 +35,16 @@ type Controller struct {
 	listSimEvent map[KeySimEvent]SimEvent
 }
 
-func NewSimController(valueChanged chan<- SimData, valueChangeRequest <-chan event.Event) *Controller {
+type Config struct {
+	ValueChanged       chan<- SimData
+	ValueChangeRequest <-chan event.Event
+}
+
+func NewSimController(cfg *Config) *Controller {
 	return &Controller{
 		shutdown:           make(chan bool),
-		valueChanged:       valueChanged,
-		valueChangeRequest: valueChangeRequest,
+		valueChanged:       cfg.ValueChanged,
+		valueChangeRequest: cfg.ValueChangeRequest,
 		simdataReady:       make(chan SimData),
 		mate:               sim.NewSimMate(),
 		indexEvent:         0,
