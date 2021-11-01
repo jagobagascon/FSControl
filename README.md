@@ -3,7 +3,7 @@ A small application to remotely control Flight Simulator.
 
 It exposes an http server in the port `8080` where you can connect using your browser (either from your computer or remotely from a mobile device or an iPad).
 
-![web/img/app.png](web/img/app.png)
+![web/img/app.png](img/app.png)
 
 ## Dev Tools
 - Go
