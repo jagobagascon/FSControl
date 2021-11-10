@@ -132,11 +132,11 @@ func (s *Server) valueChangeRequest(w http.ResponseWriter, req *http.Request) {
 		v, _ = strconv.Atoi(val[0])
 		hasval = true
 	}
-	strict := req.PostForm["strict"][0] == "true"
-	select { // use a timeout in case the reader fails
-	case s.valueChangeRequests <- event.Event{Name: n, Value: v, HasValue: hasval, IsStrict: strict}:
-	case <-time.After(time.Millisecond * 250):
-	}
+
+	go func() {
+		strict := req.PostForm["strict"][0] == "true"
+		s.valueChangeRequests <- event.Event{Name: n, Value: v, HasValue: hasval, IsStrict: strict}
+	}()
 
 	fmt.Fprintln(w, "ok")
 }

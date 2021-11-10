@@ -135,32 +135,16 @@ func (c *Controller) serverMainLoop() error {
 
 // notifyFront sends the data into the frontend channel
 func (c *Controller) notifyDataChanged(d SimData) {
-	select { // use a timeout in case the reader fails
-	case c.valueChanged <- d:
-	case <-time.After(time.Second * 1):
-		log.Println("ui<- Event lost.")
-	}
+	c.valueChanged <- d
 }
 
 func (c *Controller) triggerServerEvent(request event.Event) {
 	e := c.NewSimEvent(KeySimEvent(request.Name))
-	timeout := time.Millisecond * 200
-	if request.IsStrict {
-		timeout = time.Second * 5
-	}
 	log.Printf("Event received. Strict ? %v Val: %v", request.IsStrict, request.Value)
 	if request.HasValue {
-		select {
-		case <-e.RunWithValue(request.Value):
-		case <-time.After(timeout):
-			log.Println("fs20<- Event lost.")
-		}
+		<-e.RunWithValue(request.Value)
 	} else {
-		select {
-		case <-e.Run():
-		case <-time.After(timeout):
-			log.Println("fs20<- Event lost.")
-		}
+		<-e.Run()
 	}
 }
 
@@ -183,7 +167,7 @@ func (c *Controller) OnEventID(eventID sim.DWord) {
 	if !found {
 		fmt.Print("Ignored event")
 	}
-	cb(eventID)
+	go cb(eventID)
 	fmt.Println("Done event ID", eventID)
 
 }
@@ -223,10 +207,7 @@ func (c *Controller) NewSimEvent(simEventStr KeySimEvent) SimEvent {
 		c.indexEvent,
 	}
 	c.listEvent[c.indexEvent] = func(data sim.DWord) {
-		select {
-		case cb <- data:
-		case <-time.After(time.Millisecond * 10):
-		}
+		cb <- data
 	}
 
 	if err := c.mate.MapClientEventToSimEvent(c.indexEvent, string(simEventStr)); err != nil {
