@@ -30,7 +30,10 @@ Vue.component('radio-control', {
             // 126.700Mhz => 126700000
             // 119.000Mhz => 119000000
             this.$emit('value-changed', this.evComSet[which], mhz * 1000000 + hz * 1000, true);
-        }
+        },
+        printableMHz: function(n) {
+            return String(n.mhz) + "." + String(n.hz).padStart(3, "0")
+        },
     },
     computed: {
         // reads
@@ -147,11 +150,11 @@ Vue.component('radio-control', {
 
                     <div class="com-value-container">
                         <div class="com-value com-active">
-                            {{ comActive[n].mhz }}.{{ comActive[n].hz }} MHz
+                            {{ printableMHz(comActive[n]) }} MHz
                         </div>
 
                         <div class="com-value com-stand-by">
-                            {{ comStandBy[n].mhz }}.{{ comStandBy[n].hz }} MHz
+                            {{ printableMHz(comStandBy[n]) }} MHz
                         </div>
                     </div>
 
