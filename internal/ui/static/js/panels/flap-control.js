@@ -18,8 +18,9 @@ Vue.component('flap-control', {
     },
     methods: {
         updateFlapsIndicator: function() {
+            let maxAngle = 15;
             let indicator = this.$el.querySelector('.flaps-current-indicator')
-            indicator.style.marginTop = this.flapIndicatorY(this.flapsPercent) + "px";
+            indicator.style.setProperty("--position-angle", (maxAngle - this.flapsPercent * (2*maxAngle)) + "deg");
         },
         flapIndicatorY: function(percent) {
             if (!this.$el) return // not ready yet
@@ -39,9 +40,6 @@ Vue.component('flap-control', {
         flapsPercent: function() { return this.values["FlapsPercent"] },
         flapsPositions: function() { return this.values["FlapsPositions"] },
 
-        leverPos1: function() { return this.values["LeverPos1"] },
-        leverPos2: function() { return this.values["LeverPos2"] },
-
         // css
         containerStyle: function() {
             return {
@@ -50,66 +48,22 @@ Vue.component('flap-control', {
                 "padding": "10px",
             }
         },
-        flapCanalContainerStyle: function() {
-            return {
-                "height": "100%",
-                "width": "10%",
-                "min-width": "6em",
-                "position": "relative",
-            }
-        },
-        flapCanalStyle: function() {
-            return {
-                "height": "100%",
-                "width": "30%",
-                "background": "var(--background-color-dark)",
-                "border-radius": "1em",
-            }
-        },
-        flapCurrentStyle: function() {
-            return {
-                "height": "5%",
-                "width": "100%",
-                "min-width": "2em",
-                "background": "#555",
-                "border-radius": "3px",
-                "position": "absolute",
-                "transition": "all 500ms",
-            }
-        },
-        flapNumbers: function() {
-            return {
-                "position": "absolute",
-                "right": "0",
-                "top": "0",
-                "bottom": "0",
-                "width": "70%",
-                "text-align": "right",
-                "list-style": "none",
-                "display": "grid",
-                "align-content": "space-between",
-                "font-size": "1.2rem",
-            }
-        },
     },
     template: `
         <div v-bind:style="containerStyle">
-            <div class="flaps-canal-container" v-bind:style="flapCanalContainerStyle">
-                <div v-bind:style="flapCanalStyle">
-                    <div class="flaps-current-indicator" v-bind:style="flapCurrentStyle">
+            <div class="flaps-canal-container">
+                <div class="panel-title">FLAPS</div>
+                <div class="flaps-canal">
+                    <div class="flaps-canal-bg">
+                    </div>
+                    <div class="flaps-current-indicator">
                     </div>
                 </div>
-                <ul v-bind:style="flapNumbers">
+                <ul class="flaps-indicators">
                     <li v-for="p in (flapsPositions + 1)">
-                    {{Math.round((p - 1) / flapsPositions * 100)}} %
+                    {{Math.round(p - 1)}}
                     </li>
                 </ul>
-            </div>
-
-            <div style="position: absolute; top: 1em; left: 50%;">
-                1: {{ leverPos1 }}
-                <br />
-                2: {{ leverPos2 }}
             </div>
         </div>
     `

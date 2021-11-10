@@ -15,7 +15,7 @@ var app = new Vue({
             AutopilotHdgVar: 0,
             LeverPos1: 0,
             LeverPos2: 0,
-            FlapsAvail: false,
+            FlapsAvail: true,
             FlapsCurrent: 0,
             FlapsPositions: 4,
             FlapsPercent: 0,
