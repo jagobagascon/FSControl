@@ -4,6 +4,7 @@ Vue.component('fs-lever', {
         "positionPercent",
         "positions",
         "indicatorValues",
+        "inverted",
     ],
     data: function() {
         return {
@@ -39,7 +40,11 @@ Vue.component('fs-lever', {
         updateLeverIndicator: function(e) {
             let maxAngle = 15;
             let indicator = this.$el.querySelector('.lever-current-indicator')
-            indicator.style.setProperty("--position-angle", (maxAngle - this.targetPercent * (2*maxAngle)) + "deg");
+            let leverPos = -(maxAngle - this.targetPercent * (2*maxAngle));
+            if (this.inverted) {
+                leverPos *= -1;
+            }
+            indicator.style.setProperty("--position-angle", leverPos + "deg");
         },
         onTouchStart: function(e) {
             e.preventDefault()

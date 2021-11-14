@@ -31,6 +31,7 @@ Vue.component('flap-control', {
                 <fs-lever 
                     v-bind:positions="flapsPositions"
                     v-bind:positionPercent="flapsPercent"
+                    v-bind:inverted="true"
                     v-on:change="(newVal, oldVal) => $emit('value-changed', 'FLAPS_SET', newVal * 16383, true)">
                 </fs-lever>
                 <ul class="flaps-indicators">
