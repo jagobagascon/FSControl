@@ -79,7 +79,10 @@ Vue.component('fs-lever', {
             let y = this.lastTouchY - pageY;
             this.lastTouchY = pageY;
 
-            let delta = -y / this.touchHeight;
+            let delta = y / this.touchHeight;
+            if (this.inverted) {
+                delta *= -1;
+            }
             this.targetPercent = this.targetPercent + delta;
             this.targetPercent = Math.max(this.targetPercent, 0);
             this.targetPercent = Math.min(this.targetPercent, 1);
