@@ -338,30 +338,22 @@ html, body {
 .trim-wheel-cell:nth-child(35) { transform: rotateX(340deg) translateZ(var(--wheel-radius)); }
 .trim-wheel-cell:nth-child(36) { transform: rotateX(350deg) translateZ(var(--wheel-radius)); }
 
-
-/* FLAPS */
-.flaps-canal-container {
-    height: 100%;
-    width: 100%;
-    display: grid;
-    grid-template-columns: 40% 30% 30%;
-}
-
-.flaps-canal {
+/* LEVER */
+.lever-canal {
     height: 100%;
     width: 100%;
     position: relative;
     border-radius: 1em;
 }
 
-.flaps-canal-bg {
+.lever-canal-bg {
     background: var(--background-color-dark);
     height: 100%;
     width: 40%;
     margin-left: 30%;
 }
 
-.flaps-current-indicator {
+.lever-current-indicator {
     top: 50%;
     height: 3em;
     margin-top: -1.5em;
@@ -371,9 +363,17 @@ html, body {
     background: #555;
     border-radius: 3px;
     position: absolute;
-    transition: all 500ms;
+    /*transition: all 500ms;*/
     --position-angle: 15deg;
     transform: rotateX(var(--position-angle)) translateZ(320px);
+}
+
+/* FLAPS */
+.flaps-canal-container {
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 40% 30% 30%;
 }
 
 .flaps-indicators {

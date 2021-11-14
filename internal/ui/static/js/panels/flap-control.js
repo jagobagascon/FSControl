@@ -8,31 +8,6 @@ Vue.component('flap-control', {
             //writes
         }
     },
-    mounted: function() {
-        this.updateFlapsIndicator();
-    },
-    watch: {
-        'values.FlapsPercent': function() {
-            this.updateFlapsIndicator();
-        }
-    },
-    methods: {
-        updateFlapsIndicator: function() {
-            let maxAngle = 15;
-            let indicator = this.$el.querySelector('.flaps-current-indicator')
-            indicator.style.setProperty("--position-angle", (maxAngle - this.flapsPercent * (2*maxAngle)) + "deg");
-        },
-        flapIndicatorY: function(percent) {
-            if (!this.$el) return // not ready yet
-            let indicator = this.$el.querySelector('.flaps-current-indicator');
-            let flapsCanal = this.$el.querySelector('.flaps-canal-container');
-            
-            let containerHeight = flapsCanal.clientHeight;
-            let indicatorHeight = indicator.clientHeight;
-            let availHeight = containerHeight - indicatorHeight;
-            return availHeight * percent;
-        }
-    },
     computed: {
         // reads
         flapsAvail: function() { return this.values["FlapsAvail"] == true },
@@ -53,12 +28,11 @@ Vue.component('flap-control', {
         <div v-bind:style="containerStyle">
             <div class="flaps-canal-container">
                 <div class="panel-title">FLAPS</div>
-                <div class="flaps-canal">
-                    <div class="flaps-canal-bg">
-                    </div>
-                    <div class="flaps-current-indicator">
-                    </div>
-                </div>
+                <fs-lever 
+                    v-bind:positions="flapsPositions"
+                    v-bind:positionPercent="flapsPercent"
+                    v-on:change="(newVal, oldVal) => $emit('value-changed', 'FLAPS_SET', newVal * 16383, true)">
+                </fs-lever>
                 <ul class="flaps-indicators">
                     <li v-for="p in (flapsPositions + 1)">
                     {{Math.round(p - 1)}}
