@@ -99,7 +99,7 @@ Vue.component('lights-control', {
                 <fs-button
                     v-bind:active="strobeLightEnabled"
                     v-on:click="(v) => $emit('value-changed', evStrobeLightsSet, strobeLightEnabled ? 0 : 1, true)">
-                    STROBE
+                    STRB
                 </fs-button>
             </div>
         </div>
