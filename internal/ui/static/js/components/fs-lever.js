@@ -93,6 +93,10 @@ Vue.component('fs-lever', {
             this.updateLeverIndicator();
         },
         onTouchEnd: function(e) {
+            if (!this.dragging) {
+                return;
+            }
+            
             e.preventDefault()
 
             this.targetPercent = this.getClosestAvailPosition(this.targetPercent);
