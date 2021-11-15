@@ -59,6 +59,12 @@ type SimData struct {
 	ElevatorTrimNeutral  float64 `sim:"ELEVATOR TRIM NEUTRAL"`
 	ElevatorTrimPct      float64 `sim:"ELEVATOR TRIM PCT"`
 	ElevatorTrimPosition float64 `sim:"ELEVATOR TRIM POSITION"`
+
+	// Lights
+	LightTaxi    bool `sim:"LIGHT TAXI"`
+	LightLanding bool `sim:"LIGHT LANDING"`
+	LightNav     bool `sim:"LIGHT NAV"`
+	LightStrobe  bool `sim:"LIGHT STROBE"`
 }
 
 func (sd *SimData) Put(name string, value interface{}) {

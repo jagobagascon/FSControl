@@ -47,6 +47,11 @@
                     v-bind:values="values"
                     v-on:value-changed="onValueChanged"></throttle-control>
             </div>
+            <div class="grid-item col--2x">
+                <lights-control 
+                    v-bind:values="values"
+                    v-on:value-changed="onValueChanged"></lights-control>
+            </div>
         </div>
         <div id="full-screen-button">
             <button v-on:click="onFullScreenPressed" v-if="$el.requestFullscreen">
@@ -65,6 +70,7 @@
     <script src="js/panels/radio-control.js"></script>
     <script src="js/panels/trim-control.js"></script>
     <script src="js/panels/throttle-control.js"></script>
+    <script src="js/panels/lights-control.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

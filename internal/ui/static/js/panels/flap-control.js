@@ -30,7 +30,7 @@ Vue.component('flap-control', {
                 <div class="panel-title">FLAPS</div>
                 <div></div>
                 <div></div>
-                <div></div>
+                <div class="panel-title">TRIM</div>
                 <fs-lever 
                     v-bind:positions="flapsPositions"
                     v-bind:positionPercent="flapsPercent"
