@@ -363,9 +363,11 @@ html, body {
     background: #555;
     border-radius: 3px;
     position: absolute;
-    /*transition: all 500ms;*/
     --position-angle: 15deg;
     transform: rotateX(var(--position-angle)) translateZ(320px);
+}
+.lever-current-indicator:not(.lever-dragging) {
+    transition: all 300ms;
 }
 
 /* FLAPS */

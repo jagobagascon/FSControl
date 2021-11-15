@@ -37,7 +37,7 @@ Vue.component('fs-lever', {
         },
     },
     methods: {
-        updateLeverIndicator: function(e) {
+        updateLeverIndicator: function() {
             let maxAngle = 15;
             let indicator = this.$el.querySelector('.lever-current-indicator')
             let leverPos = -(maxAngle - this.targetPercent * (2*maxAngle));
@@ -59,7 +59,7 @@ Vue.component('fs-lever', {
 
             this.lastTouchY = pageY;
             this.dragging = true;
-
+            
         },
         onTouchMove: function(e) {
             if (!this.dragging) {
@@ -92,26 +92,29 @@ Vue.component('fs-lever', {
         onTouchEnd: function(e) {
             e.preventDefault()
 
-            // move target percent to closest available position
-            let stepSize = 1 / this.positions;
-            let closestPercent = 0;
-            let closestPercentDist = 2; // max should be 1 so this is fine
-            for (let i = 0; i <= this.positions; i++) {
-                let currentPercent = i*stepSize;
-                let currentDist = Math.abs(this.targetPercent - currentPercent);
-                if (closestPercentDist > currentDist) {
-                    closestPercentDist = currentDist;
-                    closestPercent = currentPercent;
-                }
-            }
-
-            this.targetPercent = closestPercent;
+            this.targetPercent = this.getClosestAvailPosition(this.targetPercent);
             this.updateLeverIndicator();
 
             // trigger update
             this.emitChange();
 
             this.dragging = false;
+        },
+        getClosestAvailPosition: function(v) {
+            // move target percent to closest available position
+            let stepSize = 1 / this.positions;
+            let closestPercent = 0;
+            let closestPercentDist = 2; // max should be 1 so this is fine
+            for (let i = 0; i <= this.positions; i++) {
+                let currentPercent = i*stepSize;
+                let currentDist = Math.abs(v - currentPercent);
+                if (closestPercentDist > currentDist) {
+                    closestPercentDist = currentDist;
+                    closestPercent = currentPercent;
+                }
+            }
+
+            return closestPercent;
         },
         emitChange: function() {
             clearTimeout(this.debounceChange)
@@ -124,6 +127,7 @@ Vue.component('fs-lever', {
         <div class="lever-canal">
             <div class="lever-canal-bg"></div>
             <div class="lever-current-indicator"
+                v-bind:class="{ 'lever-dragging': dragging }"
                 v-on:touchstart="onTouchStart"
                 v-on:touchend="onTouchEnd"
                 v-on:touchmove="onTouchMove"
