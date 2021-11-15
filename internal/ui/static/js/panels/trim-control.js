@@ -99,7 +99,6 @@ Vue.component('trim-control', {
         emitChange: function() {
             clearTimeout(this.debounceChange)
             this.debounceChange = setTimeout(() => {
-                console.info("TARGET: " + this.targetTrimPct);
                 this.$emit('value-changed', this.evTrimSet, -this.targetTrimPct * 16383, false);
             }, 20)
         },

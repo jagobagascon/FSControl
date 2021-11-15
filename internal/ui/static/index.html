@@ -42,11 +42,10 @@
                     v-bind:values="values"
                     v-on:value-changed="onValueChanged"></flap-control>
             </div>
-            <div class="grid-item"
-                    v-if="values.ElevatorTrimDisabled !== true">
-                <trim-control 
+            <div class="grid-item">
+                <throttle-control 
                     v-bind:values="values"
-                    v-on:value-changed="onValueChanged"></trim-control>
+                    v-on:value-changed="onValueChanged"></throttle-control>
             </div>
         </div>
         <div id="full-screen-button">
@@ -65,6 +64,7 @@
     <script src="js/panels/flap-control.js"></script>
     <script src="js/panels/radio-control.js"></script>
     <script src="js/panels/trim-control.js"></script>
+    <script src="js/panels/throttle-control.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

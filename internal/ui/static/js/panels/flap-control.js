@@ -28,6 +28,9 @@ Vue.component('flap-control', {
         <div v-bind:style="containerStyle">
             <div class="flaps-canal-container">
                 <div class="panel-title">FLAPS</div>
+                <div></div>
+                <div></div>
+                <div></div>
                 <fs-lever 
                     v-bind:positions="flapsPositions"
                     v-bind:positionPercent="flapsPercent"
@@ -39,6 +42,11 @@ Vue.component('flap-control', {
                     {{Math.round(p - 1)}}
                     </li>
                 </ul>
+                <div></div>
+                <trim-control 
+                    v-bind:values="values"
+                    v-on:value-changed="(index, newValue, strict, typeHint) => $emit('value-changed', index, newValue, strict, typeHint)">
+                </trim-control>
             </div>
         </div>
     `

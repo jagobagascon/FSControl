@@ -18,8 +18,11 @@ Vue.component('fs-lever', {
     },
     mounted: function() {
         this.updateLeverIndicator();
-        
+
         this.touchHeight = this.$el.clientHeight;
+
+        let indicator = this.$el.querySelector('.lever-current-indicator')
+        indicator.style.setProperty("--diameter", (this.touchHeight * 1.6) + "px");
 
         // setup click events. With touch devices we can move the finger anywhere in the screen,
         // while with the mouse we can only change the lever while keeping the mouse inside the indicator
