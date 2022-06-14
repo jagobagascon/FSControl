@@ -11,6 +11,7 @@ import (
 	"github.com/jagobagascon/FSControl/internal/webserver"
 )
 
+//Server is the FSControl server
 type Server struct {
 	uiServer      *webserver.Server
 	simcontroller *simdata.Controller
@@ -19,11 +20,13 @@ type Server struct {
 	simValueRequest chan event.ValueChangeRequest
 }
 
+// Config is the configuration for the FSControl server
 type Config struct {
 	Dev     bool
 	Address string
 }
 
+// NewServer creates a new server
 func NewServer(cfg *Config) *Server {
 	// Starts simcontroller service
 	simValueChanged := make(chan simdata.SimData)
@@ -48,6 +51,7 @@ func NewServer(cfg *Config) *Server {
 	}
 }
 
+// NewConfig creates a new configuration
 func NewConfig() *Config {
 	return &Config{
 		Dev:     false,
@@ -55,6 +59,7 @@ func NewConfig() *Config {
 	}
 }
 
+// Run starts the server
 func (s *Server) Run() error {
 	serverExitDone := &sync.WaitGroup{}
 
