@@ -8,11 +8,11 @@ import (
 
 	"github.com/jagobagascon/FSControl/internal/event"
 	"github.com/jagobagascon/FSControl/internal/simdata"
-	"github.com/jagobagascon/FSControl/internal/ui"
+	"github.com/jagobagascon/FSControl/internal/webserver"
 )
 
 type Server struct {
-	uiServer      *ui.Server
+	uiServer      *webserver.Server
 	simcontroller *simdata.Controller
 
 	simValueChanged chan simdata.SimData
@@ -33,7 +33,7 @@ func NewServer(cfg *Config) *Server {
 		log.Println("DEVELOPMENT MODE.")
 	}
 	return &Server{
-		uiServer: ui.NewServer(&ui.Config{
+		uiServer: webserver.NewServer(&webserver.Config{
 			Dev:                 cfg.Dev,
 			Address:             cfg.Address,
 			ValueChanged:        simValueChanged,

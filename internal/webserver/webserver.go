@@ -1,4 +1,4 @@
-package ui
+package webserver
 
 import (
 	"context"
@@ -19,6 +19,7 @@ import (
 //go:embed static/*
 var staticFiles embed.FS
 
+// Server is a web server that serves the web UI
 type Server struct {
 	dev bool
 
@@ -46,6 +47,7 @@ type Server struct {
 	clients map[chan simdata.SimData]bool
 }
 
+// Config is the configuration for the web server
 type Config struct {
 	Dev bool
 
@@ -58,6 +60,7 @@ type Config struct {
 	ValueChangeRequests chan<- event.ValueChangeRequest
 }
 
+// NewServer creates a new web server
 func NewServer(cfg *Config) *Server {
 	// Starts simdata service
 	sf, _ := fs.Sub(staticFiles, "static")
@@ -80,6 +83,7 @@ func NewServer(cfg *Config) *Server {
 	}
 }
 
+// Run starts the web server
 func (s *Server) Run(wg *sync.WaitGroup) {
 	wg.Add(1)
 	go s.listenAndServe(wg)
@@ -107,11 +111,12 @@ func (s *Server) listenAndServe(wg *sync.WaitGroup) {
 	}
 }
 
+// Stop stops the server
 func (s *Server) Stop() {
 	s.shutdown <- true
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
-	s.httpServer.Shutdown(ctx)
+	_ = s.httpServer.Shutdown(ctx)
 	log.Println("Shuting down http server")
 }
 
@@ -123,9 +128,14 @@ func (s *Server) valueChangeRequest(w http.ResponseWriter, req *http.Request) {
 	log.Println("Received request for " + req.URL.Path)
 
 	// get values
-	req.ParseForm()
+	err := req.ParseForm()
+	if err != nil {
+		log.Println("Error parsing form: " + err.Error())
+		http.Error(w, "Error parsing form", http.StatusInternalServerError)
+		return
+	}
 	n := req.PostForm["name"][0]
-	var v int = 0
+	var v int
 	hasval := false
 	if val, ok := req.PostForm["value"]; ok {
 		// has value
