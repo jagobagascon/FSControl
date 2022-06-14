@@ -10,9 +10,9 @@ import (
 	"github.com/jagobagascon/FSControl/internal/event"
 )
 
-type Var struct {
-	DefineID sim.DWord
-	Name     string
+type dWordName struct {
+	sim.DWord
+	Name string
 }
 
 type Controller struct {
@@ -21,7 +21,7 @@ type Controller struct {
 	valueChanged       chan<- SimData
 	valueChangeRequest <-chan event.ValueChangeRequest
 
-	vars         []*Var
+	vars         []*dWordName
 	simdataReady chan SimData
 	mate         *sim.SimMate
 
@@ -90,10 +90,10 @@ func (c *Controller) serverMainLoop() error {
 	// These are the sim vars we are looking for
 	c.vars = nil
 	requests := GetVarsFromSimData()
-	c.vars = make([]*Var, 0)
+	c.vars = make([]*dWordName, 0)
 	for _, request := range requests {
 		defineID := c.mate.AddSimVar(request.Name, request.Unit, request.DataType)
-		c.vars = append(c.vars, &Var{defineID, request.Name})
+		c.vars = append(c.vars, &dWordName{defineID, request.Name})
 	}
 
 	requestDataInterval := time.Millisecond * 100
@@ -175,7 +175,7 @@ func (c *Controller) OnDataReady() {
 	simData := SimData{}
 	for _, v := range c.vars {
 		// todo set simvar
-		value, _, ok := c.mate.SimVarValueAndDataType(v.DefineID)
+		value, _, ok := c.mate.SimVarValueAndDataType(v.DWord)
 		if !ok {
 			continue
 		}
