@@ -16,7 +16,7 @@ type Server struct {
 	simcontroller *simdata.Controller
 
 	simValueChanged chan simdata.SimData
-	simValueRequest chan event.Event
+	simValueRequest chan event.ValueChangeRequest
 }
 
 type Config struct {
@@ -27,7 +27,7 @@ type Config struct {
 func NewServer(cfg *Config) *Server {
 	// Starts simcontroller service
 	simValueChanged := make(chan simdata.SimData)
-	simValueRequest := make(chan event.Event)
+	simValueRequest := make(chan event.ValueChangeRequest)
 	log.Println("Starting server.")
 	if cfg.Dev {
 		log.Println("DEVELOPMENT MODE.")

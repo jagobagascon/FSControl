@@ -29,7 +29,7 @@ type Server struct {
 	shutdown chan bool
 
 	// change requests from ui to server
-	valueChangeRequests chan<- event.Event
+	valueChangeRequests chan<- event.ValueChangeRequest
 
 	//SSE
 
@@ -55,7 +55,7 @@ type Config struct {
 	ValueChanged <-chan simdata.SimData
 
 	// receives commands from the UI
-	ValueChangeRequests chan<- event.Event
+	ValueChangeRequests chan<- event.ValueChangeRequest
 }
 
 func NewServer(cfg *Config) *Server {
@@ -135,7 +135,7 @@ func (s *Server) valueChangeRequest(w http.ResponseWriter, req *http.Request) {
 
 	go func() {
 		strict := req.PostForm["strict"][0] == "true"
-		s.valueChangeRequests <- event.Event{Name: n, Value: v, HasValue: hasval, IsStrict: strict}
+		s.valueChangeRequests <- event.ValueChangeRequest{Name: n, Value: v, HasValue: hasval, IsStrict: strict}
 	}()
 
 	fmt.Fprintln(w, "ok")

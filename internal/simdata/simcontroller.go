@@ -24,7 +24,7 @@ type Controller struct {
 	shutdown chan bool
 
 	valueChanged       chan<- SimData
-	valueChangeRequest <-chan event.Event
+	valueChangeRequest <-chan event.ValueChangeRequest
 
 	vars         []*Var
 	simdataReady chan SimData
@@ -37,7 +37,7 @@ type Controller struct {
 
 type Config struct {
 	ValueChanged       chan<- SimData
-	ValueChangeRequest <-chan event.Event
+	ValueChangeRequest <-chan event.ValueChangeRequest
 }
 
 func NewSimController(cfg *Config) *Controller {
@@ -138,7 +138,7 @@ func (c *Controller) notifyDataChanged(d SimData) {
 	c.valueChanged <- d
 }
 
-func (c *Controller) triggerServerEvent(request event.Event) {
+func (c *Controller) triggerServerEvent(request event.ValueChangeRequest) {
 	e := c.NewSimEvent(KeySimEvent(request.Name))
 	log.Printf("Event received. Strict ? %v Val: %v", request.IsStrict, request.Value)
 	if request.HasValue {
