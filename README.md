@@ -1,4 +1,7 @@
 # FS Control
+
+[![CI Build and Prerelease](https://github.com/jagobagascon/FSControl/actions/workflows/ci.yml/badge.svg)](https://github.com/jagobagascon/FSControl/actions/workflows/ci.yml)
+
 A small application to remotely control Flight Simulator.
 
 It exposes an http server where you can connect using your browser (either from your computer or remotely from a mobile device or an iPad).
