@@ -15,6 +15,7 @@ type dWordName struct {
 	Name string
 }
 
+// Controller represents the SimConnect controller
 type Controller struct {
 	shutdown chan bool
 
@@ -30,11 +31,13 @@ type Controller struct {
 	listSimEvent map[KeySimEvent]SimEvent
 }
 
+// Config represents the configuration for the SimConnect controller
 type Config struct {
 	ValueChanged       chan<- SimData
 	ValueChangeRequest <-chan event.ValueChangeRequest
 }
 
+// NewSimController creates a new Controller
 func NewSimController(cfg *Config) *Controller {
 	return &Controller{
 		shutdown:           make(chan bool),
@@ -48,6 +51,7 @@ func NewSimController(cfg *Config) *Controller {
 	}
 }
 
+// Run executes the controller
 func (c *Controller) Run(wg *sync.WaitGroup) {
 	wg.Add(1)
 	go func() {
@@ -76,6 +80,7 @@ func (c *Controller) Run(wg *sync.WaitGroup) {
 	}()
 }
 
+// Stop stops the Controller
 func (c *Controller) Stop() {
 	c.shutdown <- true
 }
@@ -89,7 +94,7 @@ func (c *Controller) serverMainLoop() error {
 	// variables:
 	// These are the sim vars we are looking for
 	c.vars = nil
-	requests := GetVarsFromSimData()
+	requests := getVarsFromSimData()
 	c.vars = make([]*dWordName, 0)
 	for _, request := range requests {
 		defineID := c.mate.AddSimVar(request.Name, request.Unit, request.DataType)
@@ -134,7 +139,7 @@ func (c *Controller) notifyDataChanged(d SimData) {
 }
 
 func (c *Controller) triggerServerEvent(request event.ValueChangeRequest) {
-	e := c.NewSimEvent(KeySimEvent(request.Name))
+	e := c.newSimEvent(KeySimEvent(request.Name))
 	log.Printf("Event received. Strict ? %v Val: %v", request.IsStrict, request.Value)
 	if request.HasValue {
 		<-e.RunWithValue(request.Value)
@@ -143,6 +148,7 @@ func (c *Controller) triggerServerEvent(request event.ValueChangeRequest) {
 	}
 }
 
+// OnOpen is the OnOpen callback for mate
 func (c *Controller) OnOpen(applName, applVersion, applBuild, simConnectVersion, simConnectBuild string) {
 	fmt.Println("\nConnected.")
 	flightSimVersion := fmt.Sprintf(
@@ -152,10 +158,12 @@ func (c *Controller) OnOpen(applName, applVersion, applBuild, simConnectVersion,
 	fmt.Printf("CLEAR PROP!\n\n")
 }
 
+// OnQuit is the OnQuit callback for mate
 func (c *Controller) OnQuit() {
 	fmt.Println("Disconnected.")
 }
 
+// OnEventID is the OnEventID callback for mate
 func (c *Controller) OnEventID(eventID sim.DWord) {
 	fmt.Println("Received event ID", eventID)
 	cb, found := c.listEvent[eventID]
@@ -167,10 +175,12 @@ func (c *Controller) OnEventID(eventID sim.DWord) {
 
 }
 
+// OnException is the OnException callback for mate
 func (c *Controller) OnException(exceptionCode sim.DWord) {
 	fmt.Printf("Exception (code: %d)\n", exceptionCode)
 }
 
+// OnDataReady is the OnDataReady callback for mate
 func (c *Controller) OnDataReady() {
 	simData := SimData{}
 	for _, v := range c.vars {
@@ -179,12 +189,12 @@ func (c *Controller) OnDataReady() {
 		if !ok {
 			continue
 		}
-		simData.Put(v.Name, value)
+		simData.put(v.Name, value)
 	}
 	c.simdataReady <- simData
 }
 
-func (c *Controller) NewSimEvent(simEventStr KeySimEvent) SimEvent {
+func (c *Controller) newSimEvent(simEventStr KeySimEvent) SimEvent {
 
 	log.Println(simEventStr)
 	instance, found := c.listSimEvent[simEventStr]
@@ -219,5 +229,8 @@ func (c *Controller) NewSimEvent(simEventStr KeySimEvent) SimEvent {
 }
 
 func (c *Controller) runSimEvent(simEvent SimEvent) {
-	c.mate.TransmitClientEvent(uint32(sim.ObjectIDUser), uint32(simEvent.eventID), simEvent.Value, sim.GroupPriorityHighest, sim.EventFlagGroupIDIsPriority)
+	err := c.mate.TransmitClientEvent(uint32(sim.ObjectIDUser), uint32(simEvent.eventID), simEvent.Value, sim.GroupPriorityHighest, sim.EventFlagGroupIDIsPriority)
+	if err != nil {
+		log.Printf("An error occurred while transmitting the client event: %v", err)
+	}
 }

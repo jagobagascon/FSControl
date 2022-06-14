@@ -6,6 +6,7 @@ import (
 	sim "github.com/grumpypixel/msfs2020-simconnect-go/simconnect"
 )
 
+// SimData contains all the variables that we will read from the sim
 type SimData struct {
 	// Autopilot
 	AutopilotAvailable bool `sim:"AUTOPILOT AVAILABLE" `
@@ -67,7 +68,7 @@ type SimData struct {
 	LightStrobe  bool `sim:"LIGHT STROBE"`
 }
 
-func (sd *SimData) Put(name string, value interface{}) {
+func (sd *SimData) put(name string, value interface{}) {
 	rt := reflect.TypeOf(*sd)
 	for i := 0; i < rt.NumField(); i++ {
 		f := rt.Field(i)
@@ -165,7 +166,7 @@ type simDataVar struct {
 }
 
 // get variables from SimData struct
-func GetVarsFromSimData() []simDataVar {
+func getVarsFromSimData() []simDataVar {
 	rt := reflect.TypeOf(SimData{})
 
 	simDataVars := make([]simDataVar, 0)
