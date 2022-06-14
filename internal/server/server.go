@@ -27,7 +27,7 @@ type Config struct {
 }
 
 // NewServer creates a new server
-func NewServer(cfg *Config) *Server {
+func NewServer(cfg *Config) (*Server, error) {
 	// Starts simcontroller service
 	simValueChanged := make(chan simdata.SimData)
 	simValueRequest := make(chan event.ValueChangeRequest)
@@ -35,20 +35,25 @@ func NewServer(cfg *Config) *Server {
 	if cfg.Dev {
 		log.Println("DEVELOPMENT MODE.")
 	}
+
+	ws, err := webserver.NewServer(&webserver.Config{
+		Dev:                 cfg.Dev,
+		Address:             cfg.Address,
+		ValueChanged:        simValueChanged,
+		ValueChangeRequests: simValueRequest,
+	})
+	if err != nil {
+		return nil, err
+	}
 	return &Server{
-		uiServer: webserver.NewServer(&webserver.Config{
-			Dev:                 cfg.Dev,
-			Address:             cfg.Address,
-			ValueChanged:        simValueChanged,
-			ValueChangeRequests: simValueRequest,
-		}),
+		uiServer: ws,
 		simcontroller: simdata.NewSimController(&simdata.Config{
 			ValueChanged:       simValueChanged,
 			ValueChangeRequest: simValueRequest,
 		}),
 		simValueChanged: simValueChanged,
 		simValueRequest: simValueRequest,
-	}
+	}, nil
 }
 
 // NewConfig creates a new configuration

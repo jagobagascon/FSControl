@@ -26,10 +26,14 @@ func NewServerCommand() *ffcli.Command {
 		FlagSet:    fs,
 		Options:    []ff.Option{ff.WithConfigFileFlag("config")},
 		Exec: func(ctx context.Context, args []string) error {
-			srv := server.NewServer(&server.Config{
+			srv, err := server.NewServer(&server.Config{
 				Dev:     cfg.Dev,
 				Address: cfg.Address,
 			})
+			if err != nil {
+				return err
+			}
+
 			log.Println("fscontrol server started")
 			return srv.Run()
 		},
