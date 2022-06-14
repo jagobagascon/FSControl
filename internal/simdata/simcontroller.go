@@ -10,11 +10,6 @@ import (
 	"github.com/jagobagascon/FSControl/internal/event"
 )
 
-type Request struct {
-	Name, Unit string
-	DataType   sim.DWord
-}
-
 type Var struct {
 	DefineID sim.DWord
 	Name     string
