@@ -128,8 +128,7 @@ func (s *Server) valueChangeRequest(w http.ResponseWriter, req *http.Request) {
 	log.Println("Received request for " + req.URL.Path)
 
 	// get values
-	err := req.ParseForm()
-	if err != nil {
+	if err := req.ParseForm(); err != nil {
 		log.Println("Error parsing form: " + err.Error())
 		http.Error(w, "Error parsing form", http.StatusInternalServerError)
 		return
