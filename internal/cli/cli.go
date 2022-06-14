@@ -10,6 +10,7 @@ import (
 	"github.com/peterbourgon/ff/v3/ffcli"
 )
 
+// NewServerCommand returns a new command for starting the server.
 func NewServerCommand() *ffcli.Command {
 	fs := flag.NewFlagSet("fscontrol", flag.ExitOnError)
 
