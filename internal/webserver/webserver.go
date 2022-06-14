@@ -61,9 +61,12 @@ type Config struct {
 }
 
 // NewServer creates a new web server
-func NewServer(cfg *Config) *Server {
+func NewServer(cfg *Config) (*Server, error) {
 	// Starts simdata service
-	sf, _ := fs.Sub(staticFiles, "static")
+	sf, err := fs.Sub(staticFiles, "static")
+	if err != nil {
+		return nil, err
+	}
 	fs := http.FileServer(http.FS(sf))
 
 	return &Server{
@@ -80,7 +83,7 @@ func NewServer(cfg *Config) *Server {
 		newClients:          make(chan chan simdata.SimData),
 		closingClients:      make(chan chan simdata.SimData),
 		clients:             make(map[chan simdata.SimData]bool),
-	}
+	}, nil
 }
 
 // Run starts the web server
@@ -105,6 +108,7 @@ func (s *Server) listenAndServe(wg *sync.WaitGroup) {
 		}
 	})
 
+	log.Printf("Starting web server on %s\n", s.httpServer.Addr)
 	if err := s.httpServer.ListenAndServe(); err != http.ErrServerClosed {
 		// unexpected error. port in use?
 		log.Fatalf("ListenAndServe(): %v", err)
@@ -121,7 +125,7 @@ func (s *Server) Stop() {
 }
 
 func (s *Server) index(w http.ResponseWriter, req *http.Request) {
-	http.ServeFile(w, req, "internal/ui/static"+req.URL.Path)
+	http.ServeFile(w, req, "internal/webserver/static"+req.URL.Path)
 }
 
 func (s *Server) valueChangeRequest(w http.ResponseWriter, req *http.Request) {
