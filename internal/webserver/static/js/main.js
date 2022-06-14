@@ -2,7 +2,7 @@
 var app = new Vue({
     el: '#app',
     data: {
-        "values": {/*
+        "values": {
             AutopilotAvailable: true,
             AutopilotMaster: false,
             YawDamper: false,
@@ -33,7 +33,7 @@ var app = new Vue({
             ComAvailable3: false,
             ComActiveFrequency3: 122175000,
             ComStandByFrequency3: 118175000,
-            ComCurrent3: false,*/
+            ComCurrent3: false,
         }
     },
     methods: {

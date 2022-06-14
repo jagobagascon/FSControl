@@ -47,8 +47,7 @@ linters-settings:
 
   gosec:
     excludes:
-      - G104
-
+      - G101 # this is causing false positives
 run:
   build-tags:
     - integration
