@@ -22,8 +22,10 @@ type Server struct {
 
 // Config is the configuration for the FSControl server
 type Config struct {
-	Dev     bool
-	Address string
+	Dev         bool
+	HTTPAddress string
+
+	SimSDKLocation string
 }
 
 // NewServer creates a new server
@@ -38,19 +40,26 @@ func NewServer(cfg *Config) (*Server, error) {
 
 	ws, err := webserver.NewServer(&webserver.Config{
 		Dev:                 cfg.Dev,
-		Address:             cfg.Address,
+		HTTPAddress:         cfg.HTTPAddress,
 		ValueChanged:        simValueChanged,
 		ValueChangeRequests: simValueRequest,
 	})
 	if err != nil {
 		return nil, err
 	}
+
+	simcontroller, err := simdata.NewSimController(&simdata.Config{
+		ValueChanged:       simValueChanged,
+		ValueChangeRequest: simValueRequest,
+		SimSDKLocation:     cfg.SimSDKLocation,
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	return &Server{
-		uiServer: ws,
-		simcontroller: simdata.NewSimController(&simdata.Config{
-			ValueChanged:       simValueChanged,
-			ValueChangeRequest: simValueRequest,
-		}),
+		uiServer:        ws,
+		simcontroller:   simcontroller,
 		simValueChanged: simValueChanged,
 		simValueRequest: simValueRequest,
 	}, nil
@@ -59,8 +68,8 @@ func NewServer(cfg *Config) (*Server, error) {
 // NewConfig creates a new configuration
 func NewConfig() *Config {
 	return &Config{
-		Dev:     false,
-		Address: ":8080",
+		Dev:         false,
+		HTTPAddress: ":8080",
 	}
 }
 

@@ -3,12 +3,16 @@ package simdata
 import (
 	"fmt"
 	"log"
+	"path"
 	"sync"
 	"time"
 
 	sim "github.com/grumpypixel/msfs2020-simconnect-go/simconnect"
 	"github.com/jagobagascon/FSControl/internal/event"
 )
+
+const defaultSDKPath = "C:\\MSFS SDK"
+const simConnectPath = "SimConnect SDK\\lib"
 
 type dWordName struct {
 	sim.DWord
@@ -35,10 +39,20 @@ type Controller struct {
 type Config struct {
 	ValueChanged       chan<- SimData
 	ValueChangeRequest <-chan event.ValueChangeRequest
+
+	SimSDKLocation string
 }
 
 // NewSimController creates a new Controller
-func NewSimController(cfg *Config) *Controller {
+func NewSimController(cfg *Config) (*Controller, error) {
+	searchPath := getSimConnectDLLSearchPath(cfg.SimSDKLocation)
+	println(searchPath)
+	// initialize sim connect
+	err := sim.Initialize(searchPath)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Controller{
 		shutdown:           make(chan bool),
 		valueChanged:       cfg.ValueChanged,
@@ -48,7 +62,15 @@ func NewSimController(cfg *Config) *Controller {
 		indexEvent:         0,
 		listEvent:          make(map[sim.DWord]func(sim.DWord)),
 		listSimEvent:       make(map[KeySimEvent]SimEvent),
+	}, nil
+}
+
+func getSimConnectDLLSearchPath(simSDKLocation string) string {
+	sdkPathPath := defaultSDKPath
+	if simSDKLocation != "" {
+		sdkPathPath = simSDKLocation
 	}
+	return path.Clean(sdkPathPath + "\\" + simConnectPath)
 }
 
 // Run executes the controller
